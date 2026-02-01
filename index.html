@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOI Smart Scheduler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              indigo: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f9fafb; color: #1f2937; }
+      .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+      .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+      .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+      .fade-in { animation: fadeIn 0.3s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      /* Loader */
+      .loader { border: 2px solid #ffffff; border-top: 2px solid rgba(255,255,255,0.2); border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      
+      /* Custom Tooltip */
+      .tooltip { 
+          display: none; 
+          position: absolute; 
+          z-index: 50; 
+          background: #1e293b; 
+          color: white; 
+          padding: 8px 12px; 
+          border-radius: 6px; 
+          font-size: 11px; 
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+          pointer-events: none;
+          min-width: 200px;
+          line-height: 1.4;
+      }
+      .calendar-item:hover .tooltip-trigger { opacity: 1; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm z-20 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-md">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">KOI Smart Scheduler</h1>
+                <p class="text-xs text-gray-500 font-medium">Robust Enrollment & Prerequisite Planning</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <label class="flex items-center space-x-2 cursor-pointer bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg transition-all text-sm border border-gray-200 shadow-sm hover:shadow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Upload Timetable CSV</span>
+                <input type="file" id="fileInput" accept=".csv" class="hidden" />
+            </label>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-[420px] bg-white border-r border-gray-200 flex flex-col shadow-xl z-10 overflow-hidden">
+            <div class="flex-1 overflow-y-auto custom-scroll">
+                
+                <!-- Section 1: Program -->
+                <div class="p-5 border-b border-gray-100">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                        <span class="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-2 text-[10px]">1</span>
+                        Program Details
+                    </h2>
+                    <div class="space-y-4">
+                        <select id="programSelect" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white transition-shadow">
+                            <option value="">-- Select Your Program --</option>
+                        </select>
+
+                        <div class="grid grid-cols-2 gap-3">
+                             <div>
+                                <label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Subjects to Enroll</label>
+                                <select id="subjectCountSelect" disabled class="w-full p-2 text-sm border border-gray-300 rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50">
+                                    <option value="1">1 Subject</option>
+                                    <option value="2">2 Subjects</option>
+                                    <option value="3">3 Subjects</option>
+                                    <option value="4">4 Subjects</option>
+                                </select>
+                             </div>
+                             <div>
+                                <label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Trimester Status</label>
+                                <div id="commencingToggle" class="flex items-center p-2 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors select-none h-[38px]">
+                                    <div class="w-4 h-4 rounded border border-gray-300 mr-2 flex items-center justify-center transition-colors bg-white">
+                                        <svg class="w-3 h-3 text-white hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-700">Commencing</span>
+                                </div>
+                             </div>
+                        </div>
+
+                        <button id="btnOpenPassedModal" class="w-full hidden items-center justify-between p-3 rounded-lg border border-indigo-200 bg-indigo-50/50 text-sm text-indigo-900 hover:bg-indigo-50 transition-colors group">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-indigo-500 group-hover:text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                <span class="font-medium">Exclude Passed Subjects</span>
+                            </div>
+                            <span id="passedCountBadge" class="hidden bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: Time -->
+                <div id="sectionTime" class="p-5 border-b border-gray-100 opacity-50 pointer-events-none transition-opacity">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                        <span class="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-2 text-[10px]">2</span>
+                        Schedule Preferences
+                    </h2>
+                    
+                    <div class="flex bg-gray-100 p-1 rounded-lg mb-3">
+                        <button id="modeQuantity" class="flex-1 py-1.5 text-xs font-semibold rounded-md shadow-sm bg-white text-indigo-600 transition-all">Days per Week</button>
+                        <button id="modeSpecific" class="flex-1 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all">Specific Days</button>
+                    </div>
+
+                    <div id="containerQuantity" class="space-y-2">
+                         <div class="flex space-x-2">
+                             <button class="day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-white text-gray-600 hover:border-indigo-300 transition-all shadow-sm" data-val="2">2 Days</button>
+                             <button class="day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-100" data-val="3">3 Days</button>
+                             <button class="day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-white text-gray-600 hover:border-indigo-300 transition-all shadow-sm" data-val="4">4 Days</button>
+                             <button class="day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-white text-gray-600 hover:border-indigo-300 transition-all shadow-sm" data-val="5">5 Days</button>
+                         </div>
+                         <div class="flex items-center mt-2">
+                            <input type="checkbox" id="checkAvoidFull" checked class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4 border-gray-300">
+                            <label for="checkAvoidFull" class="ml-2 text-xs text-gray-600 select-none">Hide classes marked as "Full"</label>
+                        </div>
+                    </div>
+
+                    <div id="containerSpecific" class="hidden grid-cols-3 gap-2">
+                        <!-- Days populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Section 3: Subjects -->
+                <div id="sectionSubjects" class="p-5 flex-1 flex flex-col opacity-50 pointer-events-none transition-opacity bg-gray-50/50">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex justify-between items-center">
+                        <div class="flex items-center">
+                             <span class="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mr-2 text-[10px]">3</span>
+                             Select Subjects
+                        </div>
+                        <span id="selectedCount" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-bold">0/4</span>
+                    </h2>
+
+                    <div id="subjectListContainer" class="flex-1 min-h-[200px] overflow-y-auto custom-scroll pr-1">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Generate Button -->
+            <div class="p-5 border-t border-gray-200 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button id="btnGenerate" disabled class="w-full py-3.5 px-4 rounded-xl flex items-center justify-center font-bold text-white transition-all shadow-lg bg-gray-300 cursor-not-allowed text-sm tracking-wide">
+                     GENERATE TIMETABLES
+                </button>
+                <div id="generateHint" class="mt-2 text-[10px] text-center text-gray-400 font-medium hidden"></div>
+            </div>
+        </aside>
+
+        <!-- Right Side: Results & Calendar -->
+        <main class="flex-1 flex flex-col bg-gray-50 overflow-hidden relative">
+            
+            <!-- Tooltip Element -->
+            <div id="calendarTooltip" class="tooltip"></div>
+
+            <!-- Notification Toast -->
+            <div id="notificationBanner" class="hidden p-4 text-sm flex items-center justify-between shadow-md z-30 transition-all absolute top-4 left-1/2 transform -translate-x-1/2 rounded-lg min-w-[300px] animate-[fadeIn_0.2s_ease-out]">
+                <div class="flex items-center font-medium">
+                    <span id="notifIcon" class="mr-3"></span>
+                    <span id="notifMsg"></span>
+                </div>
+            </div>
+
+            <div class="flex-1 flex overflow-hidden pt-0">
+                <!-- Results List -->
+                <div id="resultsPanel" class="hidden w-80 bg-white border-r border-gray-200 overflow-y-auto custom-scroll shadow-inner flex flex-col">
+                    <div class="p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center justify-between">
+                            Generated Options <span id="resultsCount" class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">0</span>
+                        </h3>
+                    </div>
+                    <div id="resultsList" class="p-2 space-y-2">
+                        <!-- Schedule Items -->
+                    </div>
+                </div>
+
+                <!-- Calendar -->
+                <div class="flex-1 p-6 overflow-hidden relative flex flex-col h-full bg-gray-100/50">
+                    <div id="calendarContainer" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full relative">
+                        
+                        <!-- Empty State -->
+                        <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-white z-10">
+                            <div class="bg-indigo-50 p-6 rounded-full mb-6 animate-[bounce_2s_infinite]">
+                               <svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Ready to Schedule</h3>
+                            <p class="text-sm text-gray-500 text-center max-w-xs leading-relaxed">
+                              Select your program, define your availability, and pick your subjects to generate optimal timetables.
+                            </p>
+                        </div>
+
+                        <!-- Grid Header -->
+                        <div class="grid grid-cols-7 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                             <div class="py-3 px-2 text-[10px] font-bold text-gray-400 text-center border-r uppercase tracking-wider">Time</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r uppercase tracking-wider">Mon</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r uppercase tracking-wider">Tue</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r uppercase tracking-wider">Wed</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r uppercase tracking-wider">Thu</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r uppercase tracking-wider">Fri</div>
+                             <div class="py-3 px-2 text-xs font-bold text-gray-600 text-center border-r-0 uppercase tracking-wider">Sat</div>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div id="calendarScrollArea" class="flex-1 relative overflow-y-auto custom-scroll" style="min-height: 0;">
+                             <div id="calendarGrid" class="absolute w-full top-0 left-0"></div>
+                             <div id="calendarEvents" class="absolute w-full top-0 left-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Completed Subjects Modal -->
+    <div id="modalBackdrop" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[85vh] animate-[fadeIn_0.2s_ease-out] overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Exclude Passed Subjects</h3>
+                    <p class="text-xs text-gray-500 mt-1">Select subjects you have already completed so they don't appear in your selection list.</p>
+                </div>
+                <button id="btnCloseModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div id="modalContent" class="flex-1 overflow-y-auto custom-scroll p-6 bg-gray-50/50 space-y-6">
+                <!-- Grouped Subjects populated by JS -->
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-white flex items-center justify-between">
+                <button id="btnClearCompleted" class="text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors flex items-center">
+                    <svg class="w-3 h-3 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    Clear Selection
+                </button>
+                <button id="btnSaveCompleted" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold text-sm shadow-md transition-transform active:scale-95">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ==========================================
+// 1. DATA CONSTANTS & BUSINESS LOGIC
+// ==========================================
+const DEFAULT_CSV_DATA = `SUBJECTCODE,SUBJECTNAME,DAYOFWEEK,TIME,ACTIVITYNAME,CLASSID,CLASS,PERIOD,ROOMNAME,STAFFNAME,SUBJECTCOORDINATOR,FREQUENCY,YEAR,TRIMESTER
+ACC300,Auditing and Assurance Services,Friday,9:00:00 ~ 11:00:00,Lecture 1,ACC300NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2025,T3
+ACC300,Auditing and Assurance Services,Friday,11:00:00 ~ 13:00:00,Tutorial,ACC300NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2025,T3
+BUS709,Communication in Business,Friday,18:00:00 ~ 21:00:00,Session,BUS709NCLB0325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Sunaina GOWAN,Sunaina GOWAN,Weekly,2025,T3
+ICT106,Data Communication and Networks,Friday,13:00:00 ~ 15:00:00,Lecture 1,ICT106NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2025,T3
+ICT106,Data Communication and Networks,Friday,15:00:00 ~ 17:00:00,Tutorial,ICT106NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2025,T3
+ICT203,Human Computer Interaction,Friday,15:00:00 ~ 17:00:00,Lecture 1,ICT203NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
+ICT203,Human Computer Interaction,Friday,17:00:00 ~ 19:00:00,Tutorial,ICT203NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
+ICT370,Data Analytics,Friday,15:00:00 ~ 17:00:00,Lecture 1,ICT370NCLC0325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Nasim Ahmed,Firoz ANWAR,Weekly,2025,T3
+ICT370,Data Analytics,Friday,17:00:00 ~ 19:00:00,Tutorial,ICT370NCLCT10325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Nasim Ahmed,Firoz ANWAR,Weekly,2025,T3
+ICT371,Artificial Intelligence,Friday,13:00:00 ~ 15:00:00,Lecture 1,ICT371NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
+ICT371,Artificial Intelligence,Friday,15:00:00 ~ 17:00:00,Tutorial,ICT371NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
+ICT703,Information Systems Analysis and Design,Friday,12:00:00 ~ 15:00:00,Session,ICT703NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2025,T3
+ICT723,Virtualisation and Cloud Computing,Friday,9:00:00 ~ 12:00:00,Session,ICT723NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2025,T3
+ICT729,Capstone Project 2,Friday,10:00:00 ~ 11:00:00,Lecture 1,ICT729NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT729,Capstone Project 2,Friday,13:00:00 ~ 14:00:00,Lecture 1,ICT729NCLD0325,4,31-Oct-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT729,Capstone Project 2,Friday,11:00:00 ~ 13:00:00,Tutorial,ICT729NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT729,Capstone Project 2,Friday,14:00:00 ~ 16:00:00,Tutorial,ICT729NCLDT10325,4,31-Oct-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT741,Digital Forensics,Friday,18:00:00 ~ 21:00:00,Session,ICT741NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
+ICT751,User Experience Fundamentals,Friday,15:00:00 ~ 18:00:00,Workshop A,ICT751NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2025,T3
+MBA907,Leading the Global and Collaborative Workforce,Friday,12:00:00 ~ 15:00:00,Workshop B,MBA907NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Antony John DREW,Sunaina GOWAN,Weekly,2025,T3
+MBA908,Designing and Leading Technology Centric Enterprises,Friday,15:00:00 ~ 18:00:00,Session,MBA908NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mohammad MOBASHER KASHANI,MD Shafiqur RAHMAN,Weekly,2025,T3
+MBA910,Data Driven Strategic Decision Making,Friday,12:00:00 ~ 15:00:00,Session,MBA910NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Mohammad MOBASHER KASHANI,Tanjum HAQUE,Weekly,2025,T3
+MGT302,Strategic Management,Friday,14:00:00 ~ 16:00:00,Lecture 1,MGT302NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Lovasoa Nantenaina ANDRIAMORA,Weekly,2025,T3
+MGT302,Strategic Management,Friday,16:00:00 ~ 18:00:00,Tutorial,MGT302NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Lovasoa Nantenaina ANDRIAMORA,Weekly,2025,T3
+MGT700,Introduction to Business Management,Friday,15:00:00 ~ 18:00:00,Workshop A,MGT700NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Elsa Alexandra LICUMBA,Fadi KOTOB,Weekly,2025,T3
+TSL715,Research Project,Friday,11:00:00 ~ 14:00:00,Session,TSL715NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
+TSL718,TESOL Practicum,Friday,14:00:00 ~ 17:00:00,Placement,,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2025,T3
+ACC203,Accounting Information Systems,Monday,15:00:00 ~ 17:00:00,Lecture 1,ACC203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2025,T3
+ACC203,Accounting Information Systems,Monday,17:00:00 ~ 19:00:00,Tutorial,ACC203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2025,T3
+BUS300,Business Ethics and Sustainability,Monday,9:00:00 ~ 11:00:00,Lecture 1,BUS300NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
+BUS300,Business Ethics and Sustainability,Monday,11:00:00 ~ 13:00:00,Tutorial,BUS300NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
+FIN203,Banking and Finance,Monday,15:00:00 ~ 17:00:00,Lecture 1,FIN203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
+FIN203,Banking and Finance,Monday,17:00:00 ~ 19:00:00,Tutorial,FIN203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
+ICT100,Foundations of Information Systems,Monday,9:00:00 ~ 11:00:00,Lecture 1,ICT100NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2025,T3
+ICT100,Foundations of Information Systems,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT100NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2025,T3
+ICT102,Introduction to Programming,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT102NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2025,T3
+ICT102,Introduction to Programming,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT102NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2025,T3
+ICT200,Database Design and Development,Monday,9:00:00 ~ 11:00:00,Lecture 1,ICT200NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,BRIAN KANG,Saad Sajid Hashmi,Weekly,2025,T3
+ICT200,Database Design and Development,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT200NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,BRIAN KANG,Saad Sajid Hashmi,Weekly,2025,T3
+ICT205,Cyber Security,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT205NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Touseef RANA,Babur JALAL,Weekly,2025,T3
+ICT205,Cyber Security,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT205NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Touseef RANA,Babur JALAL,Weekly,2025,T3
+ICT274,E-commerce,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT274NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2025,T3
+ICT274,E-commerce,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT274NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2025,T3
+ICT302,Information Technology Project 2,Monday,10:00:00 ~ 11:00:00,Lecture 1,ICT302NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT302NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
+ICT370,Data Analytics,Monday,15:00:00 ~ 17:00:00,Lecture 1,ICT370NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
+ICT370,Data Analytics,Monday,17:00:00 ~ 19:00:00,Tutorial,ICT370NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
+ICT702,Introduction to Database Design,Monday,9:00:00 ~ 12:00:00,Session,ICT702NCLB0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2025,T3
+ICT726,Web Development,Monday,9:00:00 ~ 12:00:00,Session,ICT726NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Rekha NACHIAPPAN,Rekha NACHIAPPAN,Weekly,2025,T3
+ICT730,Security Analytics,Monday,15:00:00 ~ 18:00:00,Session,ICT730NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2025,T3
+ICT750,Information Systems Professional Practice,Monday,18:00:00 ~ 21:00:00,Workshop A,ICT750NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ilja NASTJUK,Ilja NASTJUK,Weekly,2025,T3
+LSC101,Learning Skills Centre-Mathematics,Monday,11:00:00 ~ 13:00:00,Session,LSC101LBNC0325,2,24-Nov-2025 ~ 20-Dec-2025,Online Class,Krish Ramanathan,,Weekly,2025,T3
+LSC105,Learning Skills Centre-Statistics,Monday,11:00:00 ~ 13:00:00,Session,LSC105NCLA0325,1,24-Nov-2025 ~ 21-Dec-2025,Online Class,Krish Ramanathan,,Weekly,2025,T3
+MBA911,Study Tour,Monday,12:00:00 ~ 15:00:00,Session,MBA911NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,G04 classroom,James Growdon COOPER,James Growdon COOPER,Weekly,2025,T3
+MGT203,Operations Management,Monday,17:00:00 ~ 19:00:00,Lecture 1,MGT203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2025,T3
+MGT203,Operations Management,Monday,19:00:00 ~ 21:00:00,Tutorial,MGT203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2025,T3
+MGT300,Logistics Management,Monday,13:00:00 ~ 15:00:00,Lecture 1,MGT300NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
+MGT300,Logistics Management,Monday,15:00:00 ~ 17:00:00,Tutorial,MGT300NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
+TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2025,T3
+TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,SYED Zaidi,SYED Zaidi,Fortnightly,2025,T3
+TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,SYED Zaidi,SYED Zaidi,Fortnightly,2025,T3
+TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,Ellie YOUNG,,Weekly,2025,T3
+TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,Ellie YOUNG,,Fortnightly,2025,T3
+TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,Ellie YOUNG,,Fortnightly,2025,T3
+TSL709,Literature and Language Teaching,Monday,10:00:00 ~ 13:00:00,Session,TSL709NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2025,T3
+TSL718,TESOL Practicum,Monday,14:00:00 ~ 17:00:00,Workshop A,TSL718NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
+TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
+TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+ICT275,Innovation and Technology Management,Saturday,9:00:00 ~ 11:00:00,Lecture 1,ICT275NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
+ICT275,Innovation and Technology Management,Saturday,11:00:00 ~ 13:00:00,Tutorial,ICT275NCLAT10325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
+ICT302,Information Technology Project 2,Saturday,11:00:00 ~ 12:00:00,Lecture 1,ICT302NCLB0325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Saturday,12:00:00 ~ 14:00:00,Tutorial,ICT302NCLBT10325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sarita KOIRALA,Weekly,2025,T3
+ICT725,User Experience and Mobile Application Development,Saturday,9:00:00 ~ 12:00:00,Session,ICT725NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2025,T3
+ICT729,Capstone Project 2,Saturday,12:00:00 ~ 13:00:00,Lecture 1,ICT729NCLC0325,3,01-Nov-2025 ~ 01-Feb-2026,Online Class,Mohamed Atef Ali Rajab MADNI,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT729,Capstone Project 2,Saturday,13:00:00 ~ 15:00:00,Tutorial,ICT729NCLCT10325,3,01-Nov-2025 ~ 01-Feb-2026,Online Class,Mohamed Atef Ali Rajab MADNI,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT731,Data Mining,Saturday,9:00:00 ~ 12:00:00,Session,ICT731NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Rachid Hamadi,Rachid Hamadi,Weekly,2025,T3
+ICT752,Enterprise Information Systems,Saturday,15:00:00 ~ 18:00:00,Workshop A,ICT752NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Prabhu Jyot Singh,Weekly,2025,T3
+ICT772,"Cyber Security Governance, Risk and Compliance",Saturday,9:00:00 ~ 12:00:00,Workshop A,ICT772NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Babur JALAL,Fazla RABBY,Weekly,2025,T3
+MBA907,Leading the Global and Collaborative Workforce,Saturday,9:00:00 ~ 12:00:00,Workshop B,MBA907NCLB0325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,mohammed ALAM,Sunaina GOWAN,Weekly,2025,T3
+MBA912,Management Report,Saturday,12:00:00 ~ 15:00:00,Session,MBA912NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Gazi HOSSAIN,Weekly,2025,T3
+ACC100,Introduction to Accounting,Thursday,15:00:00 ~ 17:00:00,Lecture 1,ACC100NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2025,T3
+ACC100,Introduction to Accounting,Thursday,17:00:00 ~ 19:00:00,Tutorial,ACC100NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2025,T3
+ACC202,Management Accounting,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ACC202NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
+ACC202,Management Accounting,Thursday,15:00:00 ~ 17:00:00,Tutorial,ACC202NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
+ACC301,Tax Law,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ACC301NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2025,T3
+ACC301,Tax Law,Thursday,15:00:00 ~ 17:00:00,Tutorial,ACC301NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2025,T3
+ACC303,Contemporary Issues in Accounting,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ACC303NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2025,T3
+ACC303,Contemporary Issues in Accounting,Thursday,11:00:00 ~ 13:00:00,Tutorial,ACC303NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2025,T3
+ACC700,Principles of Accounting,Thursday,12:00:00 ~ 15:00:00,Session,ACC700NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Behnaz ORTAKAND,Weekly,2025,T3
+ACC701,Financial Accounting,Thursday,9:00:00 ~ 12:00:00,Session,ACC701NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Vikki Melia,Meth MAVANANE HEWA,Weekly,2025,T3
+ACC702,Managerial Accounting,Thursday,12:00:00 ~ 15:00:00,Session,ACC702NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G04 classroom,Stephen Amponsah,Nazmi Saeb Nazmi JARRAR,Weekly,2025,T3
+ACC707,Auditing and Assurance,Thursday,18:00:00 ~ 21:00:00,Session,ACC707NCLB0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Demi Chung,Lu Jiao,Weekly,2025,T3
+BUS200,Law of Business Organisations,Thursday,9:00:00 ~ 11:00:00,Lecture 1,BUS200NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2025,T3
+BUS200,Law of Business Organisations,Thursday,11:00:00 ~ 13:00:00,Tutorial,BUS200NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2025,T3
+BUS304,Consumer Behaviour,Thursday,9:00:00 ~ 11:00:00,Lecture 1,BUS304NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Jianchun LI,Jianchun LI,Weekly,2025,T3
+BUS304,Consumer Behaviour,Thursday,11:00:00 ~ 13:00:00,Tutorial,BUS304NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Jianchun LI,Jianchun LI,Weekly,2025,T3
+BUS710,Research Project,Thursday,15:00:00 ~ 18:00:00,Session,BUS710NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Elsa Alexandra LICUMBA,Sayma RAHMAN,Weekly,2025,T3
+ECO100,Introduction to Economics,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ECO100NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
+ECO100,Introduction to Economics,Thursday,11:00:00 ~ 13:00:00,Tutorial,ECO100NCLAT0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
+FIN200,Corporate Financial Management,Thursday,9:00:00 ~ 11:00:00,Lecture 1,FIN200NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
+FIN200,Corporate Financial Management,Thursday,11:00:00 ~ 13:00:00,Tutorial,FIN200NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
+FIN700,Financial Management,Thursday,12:00:00 ~ 15:00:00,Session,FIN700NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Vikki Melia,Ruhina KARIM,Weekly,2025,T3
+ICT103,Systems Analysis and Design,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ICT103NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2025,T3
+ICT103,Systems Analysis and Design,Thursday,11:00:00 ~ 13:00:00,Tutorial,ICT103NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2025,T3
+ICT104,Program Design and Development,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ICT104NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2025,T3
+ICT104,Program Design and Development,Thursday,15:00:00 ~ 17:00:00,Tutorial,ICT104NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2025,T3
+ICT201,Computer Organisation and Architecture,Thursday,17:00:00 ~ 19:00:00,Lecture 1,ICT201NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2025,T3
+ICT201,Computer Organisation and Architecture,Thursday,19:00:00 ~ 21:00:00,Tutorial,ICT201NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2025,T3
+ICT204,Project Management,Thursday,15:00:00 ~ 17:00:00,Lecture 1,ICT204NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rashidul MUBASHER,Rashidul MUBASHER,Weekly,2025,T3
+ICT204,Project Management,Thursday,17:00:00 ~ 19:00:00,Tutorial,ICT204NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rashidul MUBASHER,Rashidul MUBASHER,Weekly,2025,T3
+ICT272,Web Design and Development,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ICT272NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Umesh Poudel,Weekly,2025,T3
+ICT272,Web Design and Development,Thursday,15:00:00 ~ 17:00:00,Tutorial,ICT272NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Umesh Poudel,Weekly,2025,T3
+ICT302,Information Technology Project 2,Thursday,12:00:00 ~ 13:00:00,Lecture 1,ICT302NCLE0325,5,30-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Thursday,13:00:00 ~ 15:00:00,Tutorial,ICT302NCLET10325,5,30-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Sarita KOIRALA,Weekly,2025,T3
+ICT711,Programming and Algorithms,Thursday,9:00:00 ~ 12:00:00,Session,ICT711NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Jnanamurthy HK,Saad Sajid Hashmi,Weekly,2025,T3
+ICT722,Information Security,Thursday,18:00:00 ~ 21:00:00,Session,ICT722NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2025,T3
+ICT729,Capstone Project 2,Thursday,10:00:00 ~ 11:00:00,Lecture 1,ICT729NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sajad GHATREHSAMANI,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT729,Capstone Project 2,Thursday,11:00:00 ~ 13:00:00,Tutorial,ICT729NCLBT10325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sajad GHATREHSAMANI,Sajad GHATREHSAMANI,Weekly,2025,T3
+ICT742,Cloud Privacy and Security,Thursday,15:00:00 ~ 18:00:00,Session,ICT742NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,MD Monir HOSSAIN,MD Monir HOSSAIN,Weekly,2025,T3
+ICT752,Enterprise Information Systems,Thursday,15:00:00 ~ 18:00:00,Workshop A,ICT752NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Prabhu Jyot Singh,Weekly,2025,T3
+ICT753,Industry Project,Thursday,12:00:00 ~ 15:00:00,Workshop A,ICT753NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sweta Thakur,Ali BRAYTEE,Weekly,2025,T3
+ICT761,Business Analytics and Business Intelligence,Thursday,13:00:00 ~ 16:00:00,Workshop A,ICT761NCLA0325,2,30-Oct-2025 ~ 01-Feb-2026,106 Classroom,Mohammad MOBASHER KASHANI,Xin GU,Weekly,2025,T3
+ICT762,Data Analytics and Data Visualisation,Thursday,12:00:00 ~ 15:00:00,Workshop A,ICT762NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Sanjay Jha,Shuvashis SAHA,Weekly,2025,T3
+MBA901,Career Ownership,Thursday,13:00:00 ~ 16:00:00,Session,MBA901NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,105 Classroom,Kenny Jay SHELSWELL,Evi LANASIER,Weekly,2025,T3
+MBA902,"Leading Ethical, Sustainable and Responsible Enterprise",Thursday,9:00:00 ~ 12:00:00,Session,MBA902NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G03 Classroom,Antony John DREW,Thomas DENIGAN,Weekly,2025,T3
+MBA903,Personal Performance and Resilience,Thursday,18:00:00 ~ 21:00:00,Session,MBA903NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Zaira ADNAN,Evi LANASIER,Weekly,2025,T3
+MBA904,Human Centred Design,Thursday,15:00:00 ~ 18:00:00,Session,MBA904NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G03 Classroom,Lovasoa Nantenaina ANDRIAMORA,Fariha Anjum Hira,Weekly,2025,T3
+TSL705,Language Testing and Assessment,Thursday,12:00:00 ~ 15:00:00,Session,TSL705NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
+TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,30-Oct-2025 ~ 08-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
+TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,20-Nov-2025 ~ 07-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,18-Dec-2025 ~ 21-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
+TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,15-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+ACC101,Introduction to Financial Accounting,Tuesday,10:00:00 ~ 12:00:00,Lecture 1,ACC101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2025,T3
+ACC101,Introduction to Financial Accounting,Tuesday,12:00:00 ~ 14:00:00,Tutorial,ACC101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2025,T3
+ACC201,Financial Accounting,Tuesday,17:00:00 ~ 19:00:00,Lecture 1,ACC201NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Meth MAVANANE HEWA,Meth MAVANANE HEWA,Weekly,2025,T3
+ACC201,Financial Accounting,Tuesday,19:00:00 ~ 21:00:00,Tutorial,ACC201NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Jiusi (Ethan) Zheng,Meth MAVANANE HEWA,Weekly,2025,T3
+ACC705,Corporate Accounting and Reporting,Tuesday,12:00:00 ~ 15:00:00,Session,ACC705NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Vikki Melia,Patricia VAKAFUA,Weekly,2025,T3
+ACC706,Accounting Theory and Issues,Tuesday,9:00:00 ~ 12:00:00,Session,ACC706NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Vikki Melia,Nazmi Saeb Nazmi JARRAR,Weekly,2025,T3
+ACC708,Taxation Law,Tuesday,15:00:00 ~ 18:00:00,Session,ACC708NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John TAGGART,Weekly,2025,T3
+BUS100,Professional Communication Skills,Tuesday,9:00:00 ~ 11:00:00,Lecture 1,BUS100NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,105 Classroom,Scott BAILEY,Amanda HERRING,Weekly,2025,T3
+BUS100,Professional Communication Skills,Tuesday,11:00:00 ~ 13:00:00,Tutorial,BUS100NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,105 Classroom,Scott BAILEY,Amanda HERRING,Weekly,2025,T3
+BUS101,Introduction to Business Law,Tuesday,11:00:00 ~ 13:00:00,Lecture 1,BUS101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2025,T3
+BUS101,Introduction to Business Law,Tuesday,13:00:00 ~ 15:00:00,Tutorial,BUS101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2025,T3
+BUS303,Business Project,Tuesday,17:00:00 ~ 19:00:00,Lecture 1,BUS303NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Rex WALSH,Rex WALSH,Weekly,2025,T3
+BUS303,Business Project,Tuesday,19:00:00 ~ 21:00:00,Tutorial,BUS303NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Rex WALSH,Rex WALSH,Weekly,2025,T3
+BUS700,Economics,Tuesday,18:00:00 ~ 21:00:00,Session,BUS700NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Mary Amponsah,Mary Amponsah,Weekly,2025,T3
+BUS708,Statistics and Data Analysis,Tuesday,12:00:00 ~ 15:00:00,Session,BUS708NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Krish MURALEE,Cherry MOLINA,Weekly,2025,T3
+BUS709,Communication in Business,Tuesday,9:00:00 ~ 12:00:00,Session,BUS709NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Zoe DREW,Sunaina GOWAN,Weekly,2025,T3
+FIN201,Investment Management,Tuesday,9:00:00 ~ 11:00:00,Lecture 1,FIN201NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
+FIN201,Investment Management,Tuesday,11:00:00 ~ 13:00:00,Tutorial,FIN201NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
+ICT101,Discrete Mathematics for IT,Tuesday,15:00:00 ~ 17:00:00,Lecture 1,ICT101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2025,T3
+ICT101,Discrete Mathematics for IT,Tuesday,17:00:00 ~ 19:00:00,Tutorial,ICT101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Tuesday,9:00:00 ~ 10:00:00,Lecture 1,ICT302NCLC0325,3,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sarita KOIRALA,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Tuesday,16:00:00 ~ 17:00:00,Lecture 1,ICT302NCLD0325,4,28-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Tuesday,10:00:00 ~ 12:00:00,Tutorial,ICT302NCLCT10325,3,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sarita KOIRALA,Sarita KOIRALA,Weekly,2025,T3
+ICT302,Information Technology Project 2,Tuesday,17:00:00 ~ 19:00:00,Tutorial,ICT302NCLDT10325,4,28-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
+ICT304,Enterprise Systems and Architecture,Tuesday,13:00:00 ~ 15:00:00,Lecture 1,ICT304NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
+ICT304,Enterprise Systems and Architecture,Tutorial,ICT304NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Tuesday,15:00:00 ~ 17:00:00,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
+ICT700,Introduction to Business Information Systems,Tuesday,12:00:00 ~ 15:00:00,Workshop A,ICT700NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,107 Computer Lab,Ebrahim Shahzad AWAN,Faisal NADEEM,Weekly,2025,T3
+ICT701,Programming Fundamentals,Tuesday,9:00:00 ~ 12:00:00,Session,ICT701NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2025,T3
+ICT710,IT Governance and Emerging Technologies,Tuesday,15:00:00 ~ 18:00:00,Session,ICT710NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,107 Computer Lab,Ebrahim Shahzad AWAN,MD Shafiqur RAHMAN,Weekly,2025,T3
+ICT724,Intelligent Systems,Tuesday,12:00:00 ~ 15:00:00,Session,ICT724NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Hui WU,Hui Wu,Weekly,2025,T3
+ICT732,Big Data,Tuesday,9:00:00 ~ 12:00:00,Session,ICT732NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sanjay Jha,Sanjay Jha,Weekly,2025,T3
+ICT734,Machine Learning,Tuesday,12:00:00 ~ 15:00:00,Session,ICT734NCLA0325,1,28-Oct-2025 ~ 15-Feb-2026,108 Computer Lab,Zhiheng LI,Zhiheng LI,Weekly,2025,T3
+ICT740,Applied Cybersecurity,Tuesday,18:00:00 ~ 21:00:00,Session,ICT740NCLB0325,2,28-Oct-2025 ~ 01-Feb-2026,Online Class,MD Monir HOSSAIN,Prabhu Jyot Singh,Weekly,2025,T3
+LSC100,Learning Skills Centre-English,Tuesday,9:00:00 ~ 11:00:00,Session,LSC100NCLA0325,1,18-Nov-2025 ~ 09-Dec-2025,Online Class,Amanda HERRING,Juan Wu,Weekly,2025,T3
+LSC101,Learning Skills Centre-Mathematics,Tuesday,9:00:00 ~ 11:00:00,Session,LSC101LANC0325,1,25-Nov-2025 ~ 20-Dec-2025,Online Class,Shabana CHANNA,,Weekly,2025,T3
+LSC103,Learning Skills Centre-Monitoring Students Academic Conduct,Tuesday,11:00:00 ~ 13:00:00,Session,LSC103NCLA0325,1,18-Nov-2025 ~ 09-Dec-2025,Online Class,Amanda HERRING,Juan Wu,Weekly,2025,T3
+MBA903,Personal Performance and Resilience,Tuesday,15:00:00 ~ 18:00:00,Session,MBA903NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G04 classroom,Thomas Joseph Donohue,Evi LANASIER,Weekly,2025,T3
+MBA905,Research Principles and Methodologies,Tuesday,12:00:00 ~ 15:00:00,Session,MBA905NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Zoe DREW,MD Shafiqur RAHMAN,Weekly,2025,T3
+MGT100,Introduction to Management,Tuesday,15:00:00 ~ 17:00:00,Lecture 1,MGT100NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Jennifer Michele YOUNG,mohammed ALAM,Weekly,2025,T3
+MGT100,Introduction to Management,Tuesday,17:00:00 ~ 19:00:00,Tutorial,MGT100NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Jennifer Michele YOUNG,mohammed ALAM,Weekly,2025,T3
+TSL702,Learning an Additional Language,Tuesday,13:00:00 ~ 16:00:00,Session,TSL702NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,Amanda HERRING,Amanda HERRING,Weekly,2025,T3
+TSL702,Learning an Additional Language,Tuesday,13:00:00 ~ 16:00:00,Session,TSL702NCLA0325,1,18-Nov-2025 ~ 01-Feb-2026,Online Class,Amanda HERRING,Amanda HERRING,Fortnightly,2025,T3
+TSL717,New Technologies in Language Teaching,Tuesday,10:00:00 ~ 13:00:00,Session,TSL717NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Amanda HERRING,Amanda HERRING,Weekly,2025,T3
+TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 20:00:00,Session,TSL720NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Weekly,2025,T3
+TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,18-Nov-2025 ~ 07-Dec-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Fortnightly,2025,T3
+TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,16-Dec-2025 ~ 21-Dec-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Weekly,2025,T3
+TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,13-Jan-2026 ~ 01-Feb-2026,Online Class,Ellie YOUNG,Ellie YOUNG,Fortnightly,2025,T3
+TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
+TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,18-Nov-2025 ~ 07-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,16-Dec-2025 ~ 21-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
+TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,13-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
+ACC200,Introduction to Management Accounting,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ACC200NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
+ACC200,Introduction to Management Accounting,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ACC200NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
+ACC204,Corporate Accounting and Reporting,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ACC204NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Behnaz ORTAKAND,Behnaz ORTAKAND,Weekly,2025,T3
+ACC204,Corporate Accounting and Reporting,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ACC204NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Behnaz ORTAKAND,Behnaz ORTAKAND,Weekly,2025,T3
+ACC703,Accounting Information Systems,Wednesday,9:00:00 ~ 12:00:00,Session,ACC703NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Stephen Amponsah,Ilja NASTJUK,Weekly,2025,T3
+ACC704,Companies and Securities Law,Wednesday,18:00:00 ~ 21:00:00,Session,ACC704NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,John TAGGART,John TAGGART,Weekly,2025,T3
+BUS104,Introduction to Marketing,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,BUS104NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Jennifer Michele YOUNG,Jianchun LI,Weekly,2025,T3
+BUS104,Introduction to Marketing,Wednesday,11:00:00 ~ 13:00:00,Tutorial,BUS104NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Jennifer Michele YOUNG,Jianchun LI,Weekly,2025,T3
+BUS105,Business Statistics,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,BUS105NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mary Amponsah,Matthew MACCALLUM,Weekly,2025,T3
+BUS105,Business Statistics,Wednesday,15:00:00 ~ 17:00:00,Tutorial,BUS105NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mary Amponsah,Matthew MACCALLUM,Weekly,2025,T3
+BUS302,Entrepreneurship,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,BUS302NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2025,T3
+BUS302,Entrepreneurship,Wednesday,15:00:00 ~ 17:00:00,Tutorial,BUS302NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2025,T3
+BUS702,Business Law,Wednesday,12:00:00 ~ 15:00:00,Session,BUS702NCLA0325,2,29-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,Phillip DIVISEK,Weekly,2025,T3
+BUS707,Applied Business Research,Wednesday,15:00:00 ~ 18:00:00,Session,BUS707NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Evi LANASIER,Evi LANASIER,Weekly,2025,T3
+ICT204,Project Management,Wednesday,15:00:00 ~ 17:00:00,Lecture 1,ICT204NCLB0325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ahmad HUSSEIN,Rashidul MUBASHER,Weekly,2025,T3
+ICT204,Project Management,Wednesday,17:00:00 ~ 19:00:00,Tutorial,ICT204NCLBT10325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ahmad HUSSEIN,Rashidul MUBASHER,Weekly,2025,T3
+ICT301,Information Technology Project 1,Wednesday,10:00:00 ~ 11:00:00,Lecture 1,ICT301NCLB0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sachin Kumar Singh,Sweta Thakur,Weekly,2025,T3
+ICT301,Information Technology Project 1,Wednesday,11:00:00 ~ 13:00:00,Tutorial,ICT301NCLBT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Sweta Thakur,Weekly,2025,T3
+ICT303,Professional Ethics in Computing,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,ICT303NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2025,T3
+ICT303,Professional Ethics in Computing,Wednesday,11:00:00 ~ 13:00:00,Tutorial,ICT303NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2025,T3
+ICT372,Mobile Computing,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ICT372NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Imtiazuddin Ali Khan MOHAMMED,Imtiazuddin Ali Khan MOHAMMED,Weekly,2025,T3
+ICT372,Mobile Computing,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ICT372NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Imtiazuddin Ali Khan MOHAMMED,Imtiazuddin Ali Khan MOHAMMED,Weekly,2025,T3
+ICT373,Cloud Computing,Wednesday,11:00:00 ~ 13:00:00,Lecture 1,ICT373NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2025,T3
+ICT373,Cloud Computing,Wednesday,13:00:00 ~ 15:00:00,Tutorial,ICT373NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2025,T3
+ICT712,Information Technology Project Management,Wednesday,12:00:00 ~ 15:00:00,Session,ICT712NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ilja NASTJUK,Fadi KOTOB,Weekly,2025,T3
+ICT713,Advanced Database Design and Development,Wednesday,9:00:00 ~ 12:00:00,Session,ICT713NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Faisal NADEEM,Divya LEEKHA,Weekly,2025,T3
+ICT722,Information Security,Wednesday,18:00:00 ~ 21:00:00,Session,ICT722NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sheeraz MEMON,Muhammad Sajjad Akbar,Weekly,2025,T3
+ICT728,Capstone Project 1,Wednesday,13:00:00 ~ 14:00:00,Lecture 1,ICT728NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
+ICT728,Capstone Project 1,Wednesday,14:00:00 ~ 16:00:00,Tutorial,ICT728NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
+ICT733,Social Web Analytics,Wednesday,9:00:00 ~ 12:00:00,Session,ICT733NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Xin GU,Xin GU,Weekly,2025,T3
+ICT740,Applied Cybersecurity,Wednesday,9:00:00 ~ 12:00:00,Session,ICT740NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Babur JALAL,Prabhu Jyot Singh,Weekly,2025,T3
+ICT743,IoT Security,Wednesday,12:00:00 ~ 15:00:00,Session,ICT743NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sheeraz MEMON,Prabhu Jyot Singh,Weekly,2025,T3
+ICT762,Data Analytics and Data Visualisation,Wednesday,12:00:00 ~ 15:00:00,Workshop A,ICT762NCLB0325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Shuvashis SAHA,Weekly,2025,T3
+MBA906,Financial Data Analysis and Management,Wednesday,12:00:00 ~ 15:00:00,Session,MBA906NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Stephen Amponsah,Lu Jiao,Weekly,2025,T3
+MBA909,Data Analytics,Wednesday,18:00:00 ~ 21:00:00,Session,MBA909NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
+MGT200,Organisational Behaviour,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,MGT200NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2025,T3
+MGT200,Organisational Behaviour,Wednesday,11:00:00 ~ 13:00:00,Tutorial,MGT200NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2025,T3
+TSL718,TESOL Practicum,Wednesday,17:30:00 ~ 20:30:00,Placement,,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2025,T3`;
+
+// --- PREREQUISITES ---
+const PREREQUISITES = {
+  // UNDERGRADUATE
+  'ICT103': { req: ['ICT100'], text: 'Pre-req: ICT100' },
+  'ICT104': { req: ['ICT102'], text: 'Pre-req: ICT102' },
+  'ICT200': { req: ['ICT103'], text: 'Pre-req: ICT103' },
+  'ICT204': { req: ['ICT103'], text: 'Pre-req: ICT103' },
+  'ICT205': { req: ['ICT106'], text: 'Pre-req: ICT106 (must be completed)' },
+  'ICT272': { req: ['ICT104', 'ICT200'], text: 'Pre-req: ICT104, ICT200' },
+  'ICT201': { req: [], text: 'Pre-req: 6 subjects completed', minSubjects: 6 },
+  'ICT203': { req: [], text: 'Pre-req: 6 subjects completed', minSubjects: 6 },
+  'ICT275': { req: [], text: 'Pre-req: 6 subjects completed', minSubjects: 6 },
+  'ICT301': { req: ['ICT204'], text: 'Pre-req: ICT204, Co-req: ICT272', coreq: ['ICT272'] },
+  'ICT302': { req: ['ICT301'], text: 'Pre-req: ICT301 (Last trimester only)' },
+  'ICT303': { req: [], text: 'Pre-req: 12 subjects completed', minSubjects: 12 },
+  'ICT370': { req: ['BUS105'], text: 'Pre-req: BUS105' },
+  'ICT371': { req: ['ICT104'], text: 'Pre-req: ICT104 & 12 subjects', minSubjects: 12 },
+  'ICT372': { req: ['ICT272', 'ICT205'], text: 'Pre-req: ICT272 & ICT205' },
+  'ICT373': { req: ['ICT106'], text: 'Pre-req: ICT106' },
+  'ICT304': { req: ['ICT103', 'ICT204'], text: 'Pre-req: ICT103 & ICT204' },
+  'ACC101': { req: ['ACC100'], text: 'Pre-req: ACC100' },
+  'ACC200': { req: ['ACC100'], text: 'Pre-req: ACC100' },
+  'ACC201': { req: ['ACC100', 'ACC101'], text: 'Pre-req: ACC100, ACC101, Co-req: FIN200', coreq: ['FIN200'] },
+  'ACC202': { req: ['ACC100', 'ACC200'], text: 'Pre-req: ACC100, ACC200' },
+  'ACC203': { req: ['ACC100', 'ACC101', 'ACC201'], text: 'Pre-req: ACC100, ACC101, ACC201' },
+  'ACC204': { req: ['ACC100', 'ACC101', 'ACC201'], text: 'Pre-req: ACC100, ACC101, ACC201' },
+  'ACC301': { req: ['BUS101', 'BUS200'], text: 'Pre-req: BUS101, BUS200' },
+  'ACC303': { req: ['ACC200', 'ACC201', 'ACC202', 'ACC204'], text: 'Pre-req: ACC200, ACC201, ACC202, ACC204' },
+  'ACC300': { req: ['ACC100', 'ACC101', 'ACC201'], text: 'Pre-req: ACC100, ACC101, ACC201' },
+  'BUS200': { req: ['BUS101'], text: 'Pre-req: BUS101' },
+  'BUS300': { req: ['BUS100', 'MGT100'], text: 'Pre-req: BUS100, MGT100' },
+  'BUS302': { req: ['BUS104'], text: 'Pre-req: BUS104' },
+  'BUS304': { req: ['BUS104'], text: 'Pre-req: BUS104' },
+  'FIN200': { req: ['ACC100'], text: 'Pre-req: ACC100' },
+  'FIN201': { req: ['ACC100', 'FIN200'], text: 'Pre-req: ACC100, FIN200' },
+  'FIN203': { req: ['ACC100', 'FIN200'], text: 'Pre-req: ACC100, FIN200' },
+  'FIN204': { req: ['ACC100', 'FIN200'], text: 'Pre-req: ACC100, FIN200' },
+  'FIN300': { req: [], text: '' },
+  'MGT200': { req: ['BUS100', 'MGT100'], text: 'Pre-req: BUS100, MGT100' },
+  'MGT201': { req: ['MGT100'], text: 'Pre-req: MGT100' },
+  'MGT202': { req: ['MGT200'], text: 'Pre-req: MGT200' },
+  'MGT300': { req: ['BUS100', 'MGT100'], text: 'Pre-req: BUS100, MGT100' },
+  'MGT301': { req: ['MGT200'], text: 'Pre-req: MGT200' },
+  'MGT302': { req: ['BUS100', 'MGT100', 'MGT200'], text: 'Pre-req: BUS100, MGT100, MGT200' },
+
+  // POSTGRADUATE
+  'ICT761': { req: ['MGT700'], text: 'Pre-req: MGT700' },
+  'ICT703': { req: ['ICT702'], text: 'Pre-req: ICT702' },
+  'ICT750': { req: [], text: 'Pre-req: 3 subjects completed', minSubjects: 3 },
+  'ICT752': { req: ['ICT703'], text: 'Pre-req: 8 subjects completed, ICT703', minSubjects: 8 },
+  'ICT753': { req: ['ICT703', 'ICT750'], text: 'Pre-req: 10 subjects, ICT703, ICT750 (Last Trimester)', minSubjects: 10 },
+  'ICT712': { req: [], text: 'Pre-req: 4 subjects completed', minSubjects: 4 },
+  'ICT726': { req: ['ICT711'], text: 'Pre-req: ICT711' },
+  'ICT762': { req: ['ICT761'], text: 'Pre-req: ICT761' },
+  'ICT731': { req: ['ICT713', 'ICT724'], text: 'Pre-req: ICT713, ICT724' },
+  'ICT734': { req: ['ICT762'], text: 'Pre-req: ICT762' },
+  'ICT727': { req: ['ICT712', 'ICT713'], text: 'Pre-req: ICT712, ICT713 & 12 subjects', minSubjects: 12 },
+  'ICT732': { req: ['ICT713', 'ICT731'], text: 'Pre-req: ICT713, ICT731' },
+  'ICT722': { req: [], text: '' },
+  'ICT740': { req: ['ICT722'], text: 'Pre-req: ICT722' },
+  'ICT730': { req: ['ICT740'], text: 'Pre-req: ICT740' },
+  'ICT742': { req: ['ICT722'], text: 'Pre-req: ICT722' },
+  'ICT743': { req: ['ICT722'], text: 'Pre-req: ICT722' },
+  'ICT772': { req: ['ICT722'], text: 'Pre-req: ICT722 & 8 subjects', minSubjects: 8 },
+  'ICT741': { req: ['ICT722'], text: 'Pre-req: ICT722 & 8 subjects', minSubjects: 8 },
+  'ICT780': { req: ['ICT740'], text: 'Pre-req: ICT740' },
+  'ICT733': { req: ['ICT713', 'ICT731', 'BUS708'], text: 'Pre-req: ICT713, ICT731, BUS708' },
+  'ICT728': { req: ['ICT712', 'ICT713'], text: 'Pre-req: 8 subjects, ICT712, ICT713', minSubjects: 8 },
+  'ICT729': { req: ['ICT728'], text: 'Pre-req: ICT728' },
+  'ACC701': { req: ['ACC700'], text: 'Pre-req: ACC700' },
+  'ACC702': { req: ['FIN700'], text: 'Pre-req: FIN700 (or ACC700/FIN700)' },
+  'ACC703': { req: ['ACC700'], text: 'Pre-req: ACC700' },
+  'ACC704': { req: ['BUS702'], text: 'Pre-req: BUS702' },
+  'ACC705': { req: ['ACC701', 'FIN700'], text: 'Pre-req: ACC701, FIN700' },
+  'ACC706': { req: ['ACC701', 'ACC705'], text: 'Pre-req: ACC701, ACC705' },
+  'ACC707': { req: ['ACC701', 'ACC704'], text: 'Pre-req: ACC701, ACC704' },
+  'ACC708': { req: ['ACC704'], text: 'Pre-req: ACC704 (or ACC700, ACC704, BUS702)' },
+  'TSL713': { req: [], text: 'Pre-req: 4 TSL subjects', minSubjects: 4 },
+  'TSL704': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'TSL705': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'TSL718': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'TSL715': { req: ['TSL713'], text: 'Pre-req: TSL713 (Last trimester)' },
+  'TSL709': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'TSL711': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'TSL712': { req: ['TSL700', 'TSL704'], text: 'Pre-req: TSL700, TSL704' },
+  'TSL721': { req: ['TSL702'], text: 'Pre-req: TSL702' },
+  'TSL703': { req: ['TSL700'], text: 'Pre-req: TSL700' }
+};
+
+const CAPSTONES = ['ICT302', 'BUS303', 'ICT727', 'ICT729', 'ICT753', 'BUS711', 'BUS707', 'TSL715', 'TSL718'];
+
+// --- ELECTIVE POOLS ---
+const PG_IT_ELECTIVES = ['ICT722', 'ICT723', 'ICT724', 'ICT725', 'ICT726', 'ICT731', 'ICT732', 'ICT733', 'ICT734', 'ICT740', 'ICT741', 'ICT742', 'ICT743', 'ICT761', 'ICT762', 'ICT772', 'ICT780'];
+const PG_GEN_ELECTIVES = ['BUS700', 'BUS702', 'BUS707', 'BUS708', 'BUS709', 'ACC700', 'ACC701', 'ACC703', 'ACC704', 'FIN700'];
+const UG_IT_ELECTIVES = ['ICT274', 'ICT275', 'ICT304', 'ICT371', 'ICT372', 'ICT373', 'ICT101', 'ICT104', 'ICT205'];
+const UG_GEN_ELECTIVES = ['ACC100', 'ACC101', 'ACC200', 'BUS101', 'BUS104', 'BUS300', 'BUS302', 'BUS304', 'FIN200', 'FIN201', 'FIN203', 'MGT100', 'MGT200', 'MGT201', 'MGT202', 'MGT203', 'MGT300', 'MGT301', 'MGT302'];
+
+// --- PROGRAM DEFINITIONS ---
+const PROGRAMS = [
+  { 
+    name: 'Master of Accounting', type: 'PG', 
+    coreSubjects: ['BUS709', 'ACC701', 'FIN700', 'BUS708', 'ACC702', 'ACC704', 'ACC705', 'ACC703', 'ACC706', 'ACC707', 'ACC708', 'BUS707'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Master of Professional Accounting', type: 'PG', 
+    coreSubjects: ['BUS709', 'ACC700', 'BUS700', 'BUS702', 'BUS708', 'ACC701', 'FIN700', 'ACC704', 'ACC702', 'ACC703', 'ACC705', 'ACC707', 'ACC708', 'ACC706', 'BUS711'], 
+    electiveSubjects: ['ACC709', 'ACC710', 'ACC711', 'MBA901', 'MBA902', 'MBA903', 'MBA904', 'ICT761', 'ICT700'],
+    maxElectives: 1
+  },
+  { 
+    name: 'Master of IT (Standard - 15 Subj)', type: 'PG', 
+    coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT725', 'ICT726', 'ICT727'], 
+    electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Master of IT (Data Analytics)', type: 'PG', 
+    coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT724', 'ICT761', 'ICT762', 'ICT731', 'ICT734', 'ICT727', 'ICT732'], 
+    electiveSubjects: ['ICT722', 'ICT723', 'ICT725', 'ICT726', 'ICT740', 'ICT741', 'ICT742', 'ICT743', 'ICT780', 'ICT772', 'ICT730', 'ICT733', ...PG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Master of IT (Cybersecurity)', type: 'PG', 
+    coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT722', 'ICT740', 'ICT730', 'ICT742', 'ICT743', 'ICT727', 'ICT772'], 
+    electiveSubjects: ['ICT723', 'ICT724', 'ICT725', 'ICT726', 'ICT731', 'ICT761', 'ICT762', 'ICT741', 'ICT780', ...PG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Master of IT (16 Subjects)', type: 'PG', 
+    coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT728', 'ICT729'], 
+    electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Graduate Diploma of IT', type: 'PG', 
+    coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713'], 
+    electiveSubjects: PG_IT_ELECTIVES,
+    maxElectives: 2
+  },
+  { 
+    name: 'Graduate Certificate of IT', type: 'PG', 
+    coreSubjects: ['BUS709', 'ICT710', 'ICT711'], 
+    electiveSubjects: PG_IT_ELECTIVES,
+    maxElectives: 1
+  },
+  { 
+    name: 'Master of Information Systems', type: 'PG', 
+    coreSubjects: ['MGT700', 'ICT700', 'ICT701', 'ICT702', 'ICT761', 'ICT703', 'ICT751', 'ICT750', 'ICT722', 'ICT752', 'ICT753'], 
+    electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Graduate Diploma of Info Systems', type: 'PG', 
+    coreSubjects: ['MGT700', 'ICT700', 'ICT701', 'ICT702', 'ICT761', 'ICT703', 'ICT751', 'ICT750'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Graduate Certificate of Info Systems', type: 'PG', 
+    coreSubjects: ['BUS709', 'ICT703', 'ICT701', 'ICT702'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Master of Arts (TESOL)', type: 'PG', 
+    coreSubjects: ['TSL700', 'TSL713', 'TSL702', 'TSL704', 'TSL719', 'TSL705', 'TSL720', 'TSL718', 'TSL715'], 
+    electiveSubjects: ['TSL717', 'TSL709', 'TSL711', 'TSL712', 'TSL716', 'TSL721', 'TSL703', 'ICT710', 'BUS708', 'BUS700', 'BUS702', 'BUS709'],
+    maxElectives: 3
+  },
+  { 
+    name: 'Master of Arts (TESOL) (Professional)', type: 'PG', 
+    coreSubjects: ['TSL700', 'TSL713', 'TSL702', 'TSL704', 'TSL719', 'TSL705', 'TSL720', 'TSL718', 'TSL715'], 
+    electiveSubjects: ['TSL717', 'TSL709', 'TSL711', 'TSL712', 'TSL716', 'TSL721', 'TSL703', 'ICT710', 'BUS708', 'BUS700', 'BUS702', 'BUS709'],
+    maxElectives: 4
+  },
+  { 
+    name: 'Graduate Diploma of TESOL', type: 'PG', 
+    coreSubjects: ['TSL700', 'TSL713', 'TSL702', 'TSL704', 'TSL719', 'TSL705', 'TSL720', 'TSL718'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Graduate Certificate of TESOL', type: 'PG', 
+    coreSubjects: ['TSL700', 'TSL718', 'TSL719', 'TSL720'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Graduate Diploma of Business', type: 'PG', 
+    coreSubjects: [], 
+    electiveSubjects: ['ACC700', 'BUS700', 'BUS702', 'BUS709', 'ACC701', 'FIN700', 'MGT702', 'BUS705', 'MGT708', 'BUS708', 'ACC704', 'MGT704', 'MGT707'],
+    maxElectives: 8 
+  },
+  { 
+    name: 'Graduate Certificate in Business', type: 'PG', 
+    coreSubjects: [], 
+    electiveSubjects: ['ACC700', 'BUS700', 'BUS702', 'BUS708', 'BUS709', 'MGT708'],
+    maxElectives: 4
+  },
+  { 
+    name: 'Bachelor of IT', type: 'UG', 
+    coreSubjects: ['BUS100', 'ICT100', 'ICT101', 'ICT102', 'ICT103', 'ICT104', 'ICT106', 'BUS105', 'ICT200', 'ICT201', 'ICT204', 'ICT203', 'ICT205', 'ICT272', 'ICT302', 'ICT301', 'ICT303', 'ICT370'], 
+    electiveSubjects: [...UG_IT_ELECTIVES, ...UG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Bachelor of Business (Accounting)', type: 'UG', 
+    coreSubjects: ['BUS100', 'MGT100', 'ACC100', 'BUS104', 'ECO100', 'BUS105', 'ACC101', 'BUS101', 'ACC200', 'ACC201', 'FIN200', 'MGT200', 'ACC202', 'ACC203', 'BUS200', 'ACC204', 'ACC301', 'ACC303', 'ACC300', 'BUS303'], 
+    electiveSubjects: [...UG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Bachelor of Business (Mgt & Fin)', type: 'UG', 
+    coreSubjects: ['BUS100', 'ACC100', 'ECO100', 'BUS104', 'MGT100', 'BUS105', 'MGT200', 'BUS101', 'MGT203', 'FIN200', 'ACC200', 'FIN203', 'BUS300', 'ICT274', 'FIN201', 'BUS302', 'MGT302', 'BUS303', 'MGT300', 'FIN300'], 
+    electiveSubjects: [...UG_GEN_ELECTIVES],
+    maxElectives: 4
+  },
+  { 
+    name: 'Diploma of IT', type: 'UG', 
+    coreSubjects: ['BUS100', 'ICT100', 'ICT102', 'ICT103', 'ICT106', 'BUS105'], 
+    electiveSubjects: ['ICT101', 'ICT104', 'ICT205', 'ICT274', ...UG_GEN_ELECTIVES],
+    maxElectives: 2
+  },
+  { 
+    name: 'Diploma of Accounting', type: 'UG', 
+    coreSubjects: ['BUS100', 'ACC100', 'BUS104', 'ECO100', 'MGT100', 'ACC101', 'BUS101', 'BUS105'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  },
+  { 
+    name: 'Diploma of Management', type: 'UG', 
+    coreSubjects: ['BUS100', 'BUS104', 'ECO100', 'MGT100', 'ACC100', 'BUS105', 'BUS101', 'MGT200'], 
+    electiveSubjects: [],
+    maxElectives: 0
+  }
+];
+
+function getSubjectsForProgram(availableSubjects, programName) {
+    const program = PROGRAMS.find(p => p.name === programName);
+    if (!program) return { core: [], electives: [], maxElectives: 0, rawElectives: [] };
+    
+    // Deduplication logic: Remove any subject from electives if it is in core
+    const rawCore = program.coreSubjects || [];
+    const rawElectives = (program.electiveSubjects || []).filter(e => !rawCore.includes(e));
+    
+    const core = rawCore.filter(s => availableSubjects.includes(s));
+    const electives = rawElectives.filter(s => availableSubjects.includes(s));
+    
+    // For programs like GD Business where core is a choice, assume all choices are available if needed
+    if(program.name.includes('Graduate Diploma of Business') || program.name.includes('Graduate Certificate in Business')) {
+       // Logic remains same as filter above handles it
+    }
+    return { 
+        core, 
+        electives, 
+        maxElectives: program.maxElectives !== undefined ? program.maxElectives : 4,
+        rawElectives // Return full list for passed subject checking
+    };
+}
+
+function getSubjectMetadata(code) {
+    const match = code.match(/([A-Z]+)(\d+)/);
+    if (!match) return { level: 0, isIntro: true, hasPrereq: false, isCapstone: false };
+    const numStr = match[2];
+    const num = parseInt(numStr, 10);
+    const firstDigit = parseInt(numStr[0], 10);
+    const isCapstone = CAPSTONES.includes(code);
+    let isIntro = false;
+    if (firstDigit === 1) isIntro = true;
+    else if (firstDigit === 7 && num % 100 < 12) isIntro = true;
+    else if (firstDigit === 9 && num % 100 < 7) isIntro = true;
+    else if (code.startsWith('LSC')) isIntro = true;
+    const pData = PREREQUISITES[code];
+    const hasPrereq = pData && (pData.req.length > 0 || pData.minSubjects > 0);
+    return { level: num, isIntro, hasPrereq: !!hasPrereq, isCapstone };
+}
+
+function checkPrerequisites(code, completedSubjects) {
+    const pData = PREREQUISITES[code];
+    if (!pData) return { met: true, missing: [] };
+    
+    const missing = pData.req.filter(req => !completedSubjects.includes(req));
+    let met = missing.length === 0;
+    
+    // Check min subjects count
+    if (pData.minSubjects && completedSubjects.length < pData.minSubjects) {
+        met = false;
+        missing.push(`${pData.minSubjects} subjects total`);
+    }
+    
+    return { met, missing };
+}
+
+// ==========================================
+// 2. PARSER & SOLVER UTILS
+// ==========================================
+function parseCSV(csv) {
+    const lines = csv.split(/\r?\n/).filter((line) => line.trim() !== '');
+    if (lines.length < 2) return [];
+    let headerIndex = -1;
+    for (let i = 0; i < Math.min(lines.length, 20); i++) {
+        if (lines[i].includes('SUBJECTCODE')) {
+            headerIndex = i;
+            break;
+        }
+    }
+    if (headerIndex === -1) return [];
+
+    // Parse headers and clean BOM/whitespace
+    const headers = parseCSVLine(lines[headerIndex]).map((h) => h.trim().replace(/^[\uFEFF\u200B]/, ''));
+    const results = [];
+
+    for (let i = headerIndex + 1; i < lines.length; i++) {
+        const currentLine = lines[i];
+        if (!currentLine.includes(',')) continue;
+        const values = parseCSVLine(currentLine);
+        if (values.length < headers.length - 2) continue;
+
+        const entry = {};
+        headers.forEach((header, index) => {
+            if (values[index] !== undefined) {
+                entry[header] = values[index].trim();
+            }
+        });
+
+        // Check for required fields, allowing TIME or TIME1
+        if (entry.SUBJECTCODE && (entry.TIME || entry.TIME1)) {
+            results.push(entry);
+        }
+    }
+    return results;
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            result.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    result.push(current);
+    return result;
+}
+
+function parseTimeRange(timeStr) {
+    if (!timeStr) return null;
+    const separator = timeStr.includes('~') ? '~' : (timeStr.includes('-') ? '-' : null);
+    if (!separator) return null;
+    const [startStr, endStr] = timeStr.split(separator).map((s) => s.trim());
+    const toMinutes = (t) => {
+        const parts = t.split(':');
+        if (parts.length < 2) return 0;
+        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    };
+    return {
+        start: toMinutes(startStr),
+        end: toMinutes(endStr),
+    };
+}
+
+function getDayIndex(day) {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return days.indexOf(day.toLowerCase());
+}
+
+function processRawData(raw) {
+    return raw.map((entry) => {
+        const timeStr = entry.TIME || entry.TIME1;
+        const time = parseTimeRange(timeStr);
+        return {
+            id: entry.CLASSID || Math.random().toString(36).substr(2, 9),
+            subjectCode: entry.SUBJECTCODE,
+            subjectName: entry.SUBJECTNAME,
+            activity: entry.ACTIVITYNAME,
+            day: entry.DAYOFWEEK,
+            dayIndex: getDayIndex(entry.DAYOFWEEK),
+            startTime: time ? time.start : 0,
+            endTime: time ? time.end : 0,
+            room: entry.ROOMNAME,
+            staff: entry.STAFFNAME,
+            isFull: entry.CLASSISFULL?.toLowerCase() === 'full',
+            rawTime: timeStr,
+        };
+    }).filter(s => s.startTime !== 0);
+}
+
+// ---------------------- SOLVER ----------------------
+function generateSchedules(allSessions, selectedSubjects, prefs) {
+    if (selectedSubjects.length === 0) return [];
+    
+    // Group by Subject -> Activity
+    const subjectGroups = {};
+    selectedSubjects.forEach((subCode) => {
+        const subjectSessions = allSessions.filter((s) => s.subjectCode === subCode);
+        const activityGroups = {};
+        subjectSessions.forEach((s) => {
+            if (prefs.avoidFullClasses && s.isFull) return;
+            if (!activityGroups[s.activity]) activityGroups[s.activity] = [];
+            activityGroups[s.activity].push(s);
+        });
+        subjectGroups[subCode] = activityGroups;
+    });
+
+    // Buckets
+    const buckets = [];
+    Object.keys(subjectGroups).forEach((subCode) => {
+        const activities = subjectGroups[subCode];
+        Object.keys(activities).forEach((actName) => {
+            if (activities[actName].length > 0) buckets.push(activities[actName]);
+        });
+    });
+
+    if (buckets.length === 0) return [];
+
+    const validSchedules = [];
+    const MAX_RESULTS = 100;
+
+    const isOverlap = (s1, s2) => {
+        if (s1.dayIndex !== s2.dayIndex) return false;
+        return Math.max(s1.startTime, s2.startTime) < Math.min(s1.endTime, s2.endTime);
+    };
+
+    const countClassesPerDay = (sessions) => {
+        const counts = {};
+        sessions.forEach(s => {
+            counts[s.dayIndex] = (counts[s.dayIndex] || 0) + 1;
+        });
+        return counts;
+    };
+
+    const findRecursive = (bucketIndex, currentSchedule) => {
+        if (validSchedules.length >= MAX_RESULTS) return;
+
+        if (bucketIndex === buckets.length) {
+            const daysCount = new Set(currentSchedule.map(s => s.dayIndex)).size;
+            const classCounts = countClassesPerDay(currentSchedule);
+            const maxDaily = Math.max(...Object.values(classCounts));
+
+            if (prefs.maxDaysPerWeek > 0 && daysCount > prefs.maxDaysPerWeek) return;
+            if (prefs.maxClassesPerDay > 0 && maxDaily > prefs.maxClassesPerDay) return;
+
+            validSchedules.push({
+                id: Math.random().toString(36).substr(2, 9),
+                sessions: [...currentSchedule],
+                daysActive: daysCount,
+                score: daysCount * 100 + maxDaily,
+                clashes: 0
+            });
+            return;
+        }
+
+        const currentBucket = buckets[bucketIndex];
+        for (const session of currentBucket) {
+            let clash = false;
+            for (const existing of currentSchedule) {
+                if (isOverlap(session, existing)) {
+                    clash = true;
+                    break;
+                }
+            }
+            if (clash) continue;
+
+            findRecursive(bucketIndex + 1, [...currentSchedule, session]);
+            if (validSchedules.length >= MAX_RESULTS) return;
+        }
+    };
+
+    findRecursive(0, []);
+    return validSchedules.sort((a, b) => a.score - b.score);
+}
+
+function findValidCombinations(allSessions, compatibleSubjectCodes, lockedSubjectCodes, targetCount, prefs, electiveConstraint) {
+    const pool = compatibleSubjectCodes.filter(c => !lockedSubjectCodes.includes(c));
+    const needed = targetCount - lockedSubjectCodes.length;
+
+    // Strict Elective Check for combinations
+    const lockedElectives = lockedSubjectCodes.filter(s => electiveConstraint.validElectives.includes(s)).length;
+    const initialElectiveSlots = electiveConstraint.remainingSlots - lockedElectives;
+
+    if (initialElectiveSlots < 0) {
+        // User manually selected more than allowed?
+        return [];
+    }
+
+    if (needed <= 0) {
+        return generateSchedules(allSessions, lockedSubjectCodes, prefs);
+    }
+
+    const results = [];
+    const MAX_GLOBAL_RESULTS = 20;
+    const MAX_TESTS = 3000;
+    let tests = 0;
+
+    const combine = (startIndex, currentSet) => {
+        if (results.length >= MAX_GLOBAL_RESULTS) return;
+        if (tests >= MAX_TESTS) return;
+
+        if (currentSet.length === needed) {
+            tests++;
+            
+            // Check if this combination exceeds elective limits
+            const currentElectives = currentSet.filter(s => electiveConstraint.validElectives.includes(s)).length;
+            if (currentElectives > initialElectiveSlots) {
+                return; // Skip invalid combination
+            }
+
+            const fullSubjectList = [...lockedSubjectCodes, ...currentSet];
+            const schedules = generateSchedules(allSessions, fullSubjectList, prefs);
+            if (schedules.length > 0) {
+                results.push(schedules[0]);
+            }
+            return;
+        }
+
+        for (let i = startIndex; i < pool.length; i++) {
+            combine(i + 1, [...currentSet, pool[i]]);
+            if (results.length >= MAX_GLOBAL_RESULTS) return;
+        }
+    };
+
+    combine(0, []);
+    return results.sort((a, b) => a.score - b.score);
+}
+
+// ==========================================
+// 4. MAIN APP LOGIC
+// ==========================================
+const state = {
+    rawData: [],
+    processedSessions: [],
+    allSubjectCodes: [],
+    selectedProgram: '',
+    isCommencing: false,
+    targetSubjectCount: 4,
+    filterMode: 'quantity', // 'quantity' | 'specific'
+    completedSubjects: [],
+    availableDays: [],
+    desiredDaysCount: 3,
+    selectedSubjects: [],
+    generatedSchedules: [],
+    activeScheduleId: null,
+    preferences: {
+        maxDaysPerWeek: 6,
+        maxClassesPerDay: 5,
+        avoidFullClasses: true,
+        preferredDays: []
+    }
+};
+
+// DOM Elements
+const el = {
+    fileInput: document.getElementById('fileInput'),
+    programSelect: document.getElementById('programSelect'),
+    subjectCountSelect: document.getElementById('subjectCountSelect'),
+    commencingToggle: document.getElementById('commencingToggle'),
+    btnOpenPassedModal: document.getElementById('btnOpenPassedModal'),
+    passedCountBadge: document.getElementById('passedCountBadge'),
+    sectionTime: document.getElementById('sectionTime'),
+    sectionSubjects: document.getElementById('sectionSubjects'),
+    modeQuantity: document.getElementById('modeQuantity'),
+    modeSpecific: document.getElementById('modeSpecific'),
+    containerQuantity: document.getElementById('containerQuantity'),
+    containerSpecific: document.getElementById('containerSpecific'),
+    dayOptBtns: document.querySelectorAll('.day-opt-btn'),
+    checkAvoidFull: document.getElementById('checkAvoidFull'),
+    subjectListContainer: document.getElementById('subjectListContainer'),
+    selectedCount: document.getElementById('selectedCount'),
+    btnGenerate: document.getElementById('btnGenerate'),
+    generateHint: document.getElementById('generateHint'),
+    notificationBanner: document.getElementById('notificationBanner'),
+    resultsPanel: document.getElementById('resultsPanel'),
+    resultsList: document.getElementById('resultsList'),
+    resultsCount: document.getElementById('resultsCount'),
+    calendarContainer: document.getElementById('calendarContainer'),
+    emptyState: document.getElementById('emptyState'),
+    calendarGrid: document.getElementById('calendarGrid'),
+    calendarEvents: document.getElementById('calendarEvents'),
+    calendarTooltip: document.getElementById('calendarTooltip'),
+    // Modal
+    modalBackdrop: document.getElementById('modalBackdrop'),
+    modalContent: document.getElementById('modalContent'),
+    btnCloseModal: document.getElementById('btnCloseModal'),
+    btnClearCompleted: document.getElementById('btnClearCompleted'),
+    btnSaveCompleted: document.getElementById('btnSaveCompleted')
+};
+
+// --- INITIALIZATION ---
+function init() {
+    // Populate Program Dropdown
+    el.programSelect.innerHTML = '<option value="">-- Select Your Program --</option>';
+    const pgGroup = document.createElement('optgroup'); pgGroup.label = "Postgraduate";
+    const ugGroup = document.createElement('optgroup'); ugGroup.label = "Undergraduate";
+    
+    PROGRAMS.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.name;
+        opt.textContent = p.name;
+        if (p.type === 'PG') pgGroup.appendChild(opt);
+        else ugGroup.appendChild(opt);
+    });
+    
+    el.programSelect.appendChild(pgGroup);
+    el.programSelect.appendChild(ugGroup);
+
+    // Populate Specific Days
+    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(day => {
+        const btn = document.createElement('button');
+        btn.className = "day-specific-btn px-3 py-2 text-xs font-medium rounded-md border transition-all bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:bg-gray-50";
+        btn.textContent = day;
+        btn.onclick = () => toggleSpecificDay(day, btn);
+        el.containerSpecific.appendChild(btn);
+    });
+
+    // Default Load
+    loadData(DEFAULT_CSV_DATA);
+
+    // Setup Calendar Grid
+    renderCalendarGrid();
+
+    // Event Listeners
+    el.fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => loadData(ev.target.result);
+        reader.readAsText(file);
+    });
+
+    el.programSelect.addEventListener('change', (e) => {
+        state.selectedProgram = e.target.value;
+        state.selectedSubjects = [];
+        state.completedSubjects = [];
+        state.generatedSchedules = [];
+        state.activeScheduleId = null;
+        const prog = PROGRAMS.find(p => p.name === state.selectedProgram);
+        state.targetSubjectCount = (prog && prog.type === 'PG') ? 3 : 4;
+        el.subjectCountSelect.value = state.targetSubjectCount;
+        updateUI();
+    });
+
+    el.subjectCountSelect.addEventListener('change', (e) => {
+        state.targetSubjectCount = parseInt(e.target.value);
+        updateGenerateButton();
+    });
+
+    el.commencingToggle.addEventListener('click', () => {
+        state.isCommencing = !state.isCommencing;
+        const check = el.commencingToggle.querySelector('svg');
+        const text = el.commencingToggle.querySelector('span');
+        if(state.isCommencing) {
+            el.commencingToggle.classList.add('bg-indigo-50', 'border-indigo-200');
+            const box = el.commencingToggle.querySelector('div');
+            box.classList.add('bg-indigo-600', 'border-indigo-600');
+            box.classList.remove('bg-white', 'border-gray-300');
+            check.classList.remove('hidden');
+            text.classList.add('text-indigo-700');
+        } else {
+            el.commencingToggle.classList.remove('bg-indigo-50', 'border-indigo-200');
+            const box = el.commencingToggle.querySelector('div');
+            box.classList.remove('bg-indigo-600', 'border-indigo-600');
+            box.classList.add('bg-white', 'border-gray-300');
+            check.classList.add('hidden');
+            text.classList.remove('text-indigo-700');
+        }
+        renderSubjectList();
+    });
+
+    el.modeQuantity.addEventListener('click', () => setTimeMode('quantity'));
+    el.modeSpecific.addEventListener('click', () => setTimeMode('specific'));
+
+    el.dayOptBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.desiredDaysCount = parseInt(btn.dataset.val);
+            // Update visual
+            el.dayOptBtns.forEach(b => {
+                b.className = "day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-white text-gray-600 hover:border-indigo-300 transition-all shadow-sm";
+            });
+            btn.className = "day-opt-btn flex-1 py-2 text-sm font-bold border rounded-lg bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-100";
+            renderSubjectList(); // Filter depends on combinatorics
+        });
+    });
+
+    el.checkAvoidFull.addEventListener('change', (e) => {
+        state.preferences.avoidFullClasses = e.target.checked;
+    });
+
+    el.btnOpenPassedModal.addEventListener('click', openCompletedModal);
+    el.btnCloseModal.addEventListener('click', () => el.modalBackdrop.classList.add('hidden'));
+    el.btnSaveCompleted.addEventListener('click', () => {
+        el.modalBackdrop.classList.add('hidden');
+        state.selectedSubjects = state.selectedSubjects.filter(s => !state.completedSubjects.includes(s));
+        updateUI();
+    });
+    el.btnClearCompleted.addEventListener('click', () => {
+        const checks = el.modalContent.querySelectorAll('input');
+        checks.forEach(c => c.checked = false);
+        state.completedSubjects = [];
+    });
+
+    el.btnGenerate.addEventListener('click', handleGenerate);
+}
+
+// Logic Functions
+function loadData(csv) {
+    try {
+        const parsed = parseCSV(csv);
+        if(parsed.length === 0) throw new Error("Empty CSV");
+        state.rawData = parsed;
+        state.processedSessions = processRawData(parsed);
+        const codes = new Set(state.processedSessions.map(s => s.subjectCode));
+        state.allSubjectCodes = Array.from(codes).sort();
+        showNotification(`Loaded ${parsed.length} sessions.`, 'success');
+        updateUI(); // Refresh subject lists if program selected
+    } catch(e) {
+        showNotification("Failed to parse CSV.", 'error');
+    }
+}
+
+function setTimeMode(mode) {
+    state.filterMode = mode;
+    if(mode === 'quantity') {
+        el.modeQuantity.className = "flex-1 py-1.5 text-xs font-semibold rounded-md shadow-sm bg-white text-indigo-600 transition-all";
+        el.modeSpecific.className = "flex-1 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all";
+        el.containerQuantity.classList.remove('hidden');
+        el.containerSpecific.classList.remove('grid');
+        el.containerSpecific.classList.add('hidden');
+    } else {
+        el.modeSpecific.className = "flex-1 py-1.5 text-xs font-semibold rounded-md shadow-sm bg-white text-indigo-600 transition-all";
+        el.modeQuantity.className = "flex-1 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700 transition-all";
+        el.containerSpecific.classList.remove('hidden');
+        el.containerSpecific.classList.add('grid');
+        el.containerQuantity.classList.add('hidden');
+    }
+    renderSubjectList();
+}
+
+function toggleSpecificDay(day, btn) {
+    if(state.availableDays.includes(day)) {
+        state.availableDays = state.availableDays.filter(d => d !== day);
+        btn.className = "day-specific-btn px-3 py-2 text-xs font-medium rounded-md border transition-all bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:bg-gray-50";
+    } else {
+        state.availableDays.push(day);
+        btn.className = "day-specific-btn px-3 py-2 text-xs font-medium rounded-md border transition-all bg-indigo-600 text-white border-indigo-600 shadow-sm";
+    }
+    renderSubjectList();
+}
+
+function canFitSubject(subjectCode) {
+    const sessions = state.processedSessions.filter(s => s.subjectCode === subjectCode);
+    if(sessions.length === 0) return false;
+
+    if(state.filterMode === 'specific') {
+        if(state.availableDays.length === 0) return true;
+        const activities = [...new Set(sessions.map(s => s.activity))];
+        for(let act of activities) {
+            const hasOption = sessions.some(s => s.activity === act && state.availableDays.includes(s.day));
+            if(!hasOption) return false;
+        }
+        return true;
+    } else {
+        // Combinatorial check for N days
+        return checkFitInDays(sessions, state.desiredDaysCount);
+    }
+}
+
+function checkFitInDays(sessions, maxDays) {
+    const activities = {};
+    sessions.forEach(s => {
+        if (!activities[s.activity]) activities[s.activity] = [];
+        activities[s.activity].push(s);
+    });
+    const activityKeys = Object.keys(activities);
+    let possible = false;
+    const backtrack = (index, currentDays) => {
+        if (possible || currentDays.size > maxDays) return;
+        if (index === activityKeys.length) { possible = true; return; }
+        const opts = activities[activityKeys[index]];
+        const tried = new Set();
+        for (const opt of opts) {
+             if(tried.has(opt.dayIndex)) continue;
+             tried.add(opt.dayIndex);
+             const nextDays = new Set(currentDays); nextDays.add(opt.dayIndex);
+             backtrack(index + 1, nextDays);
+        }
+    };
+    backtrack(0, new Set());
+    return possible;
+}
+
+function updateUI() {
+    if(state.selectedProgram) {
+        el.sectionTime.classList.remove('opacity-50', 'pointer-events-none');
+        el.sectionSubjects.classList.remove('opacity-50', 'pointer-events-none');
+        el.subjectCountSelect.disabled = false;
+        el.btnOpenPassedModal.classList.remove('hidden'); el.btnOpenPassedModal.classList.add('flex');
+    } else {
+        el.sectionTime.classList.add('opacity-50', 'pointer-events-none');
+        el.sectionSubjects.classList.add('opacity-50', 'pointer-events-none');
+        el.subjectCountSelect.disabled = true;
+        el.btnOpenPassedModal.classList.add('hidden'); el.btnOpenPassedModal.classList.remove('flex');
+    }
+    if(state.completedSubjects.length > 0) {
+        el.passedCountBadge.textContent = `${state.completedSubjects.length}`;
+        el.passedCountBadge.classList.remove('hidden');
+    } else {
+        el.passedCountBadge.classList.add('hidden');
+    }
+    renderSubjectList();
+    updateGenerateButton();
+}
+
+function renderSubjectList() {
+    if(!state.selectedProgram) {
+        el.subjectListContainer.innerHTML = '<div class="text-center text-gray-400 text-xs mt-10">Select a program</div>';
+        return;
+    }
+    const { core, electives, maxElectives, rawElectives } = getSubjectsForProgram(state.allSubjectCodes, state.selectedProgram);
+    
+    // Count passed electives
+    // A subject counts as a passed elective if it is in the raw elective list for the program
+    const passedElectivesCount = state.completedSubjects.filter(s => rawElectives.includes(s)).length;
+    
+    // Remaining allowance
+    const remainingElectivesAllowed = Math.max(0, maxElectives - passedElectivesCount);
+    
+    // Count currently selected electives from the UI
+    const selectedElectiveCount = electives.filter(e => state.selectedSubjects.includes(e)).length;
+    
+    el.subjectListContainer.innerHTML = '';
+
+    const isVisible = (code) => {
+        if(state.completedSubjects.includes(code)) return false;
+        const meta = getSubjectMetadata(code);
+        if(state.isCommencing && !meta.isIntro) return false;
+        return canFitSubject(code);
+    };
+
+    const validCore = core.filter(isVisible);
+    const validElectives = electives.filter(isVisible);
+
+    if(validCore.length === 0 && validElectives.length === 0) {
+        el.subjectListContainer.innerHTML = '<div class="text-center text-gray-400 text-xs mt-10 p-4">No subjects found matching filters (or all passed).</div>';
+        return;
+    }
+
+    const renderGroup = (title, items, isElectiveGroup) => {
+        if(items.length === 0) return;
+        const header = document.createElement('div');
+        header.className = `px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider flex items-center ${isElectiveGroup ? 'bg-gray-100 text-gray-600 border-y border-gray-200 mt-4' : 'bg-indigo-50 text-indigo-800 border-b border-indigo-100 sticky top-0 z-10'}`;
+        header.innerHTML = isElectiveGroup ? 
+            `<div class="flex-1 flex justify-between items-center">
+               <div class="flex items-center"><svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Electives</div>
+               <span class="bg-gray-200 px-1.5 rounded text-[9px] ${remainingElectivesAllowed === 0 ? 'text-red-600' : 'text-gray-600'}">${selectedElectiveCount}/${remainingElectivesAllowed} remaining</span>
+             </div>` : 
+            `<svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Core Subjects`;
+        
+        // Add error banner for electives
+        if(isElectiveGroup) {
+             el.subjectListContainer.appendChild(header);
+             if(remainingElectivesAllowed === 0) {
+                 const warning = document.createElement('div');
+                 warning.className = "text-[10px] bg-red-50 text-red-800 px-3 py-2 border-b border-red-100 flex items-start leading-tight";
+                 warning.innerHTML = `You have completed the maximum number of electives (${maxElectives}) for this program.`;
+                 el.subjectListContainer.appendChild(warning);
+             } else if(selectedElectiveCount >= remainingElectivesAllowed) {
+                 const warning = document.createElement('div');
+                 warning.className = "text-[10px] bg-amber-50 text-amber-800 px-3 py-2 border-b border-amber-100 flex items-start leading-tight";
+                 warning.innerHTML = `Limit reached. Deselect an elective to choose another.`;
+                 el.subjectListContainer.appendChild(warning);
+             }
+        } else {
+             el.subjectListContainer.appendChild(header);
+        }
+
+        items.forEach(code => {
+            const isSelected = state.selectedSubjects.includes(code);
+            const meta = getSubjectMetadata(code);
+            const name = state.processedSessions.find(s => s.subjectCode === code)?.subjectName || '';
+            const reqCheck = checkPrerequisites(code, state.completedSubjects);
+            
+            let isLocked = !state.isCommencing && !reqCheck.met;
+            let lockReason = reqCheck.missing.length > 0 ? reqCheck.missing.join(', ') : 'Prerequisites not met';
+            
+            // Elective Limit Logic
+            if(isElectiveGroup && !isSelected) {
+                if (remainingElectivesAllowed === 0) {
+                    isLocked = true;
+                    lockReason = 'Max program electives completed';
+                } else if (selectedElectiveCount >= remainingElectivesAllowed) {
+                    isLocked = true;
+                    lockReason = 'Selection limit reached';
+                }
+            }
+
+            const pData = PREREQUISITES[code];
+            const preReqText = pData ? pData.text : '';
+
+            const div = document.createElement('div');
+            div.className = `flex items-start p-3 mb-1 mx-2 mt-2 rounded-lg border transition-all cursor-pointer select-none group ${
+                isLocked ? 'bg-gray-50 border-gray-200 opacity-60' : 
+                isSelected ? 'bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-100' : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-sm'
+            }`;
+
+            // Logic for badges
+            let badgeHTML = '';
+            if(meta.isCapstone) {
+                badgeHTML += `<span class="text-[9px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 flex items-center font-semibold mr-1"><svg class="w-2 h-2 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Capstone</span>`;
+            }
+            if(isLocked) {
+                const icon = lockReason.includes('reached') || lockReason.includes('completed') ? 
+                    '<svg class="w-2 h-2 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>' : 
+                    '<svg class="w-2 h-2 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+                badgeHTML += `<span class="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded border border-gray-200 flex items-center" title="${lockReason}">${icon} ${lockReason}</span>`;
+            } else if (!state.isCommencing && meta.hasPrereq && !meta.isCapstone) {
+                badgeHTML += `<span class="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-100 flex items-center font-medium"><svg class="w-2 h-2 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Prereq Met</span>`;
+            }
+
+            div.innerHTML = `
+                <div class="w-5 h-5 mt-0.5 mr-3 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white group-hover:border-indigo-300'}">
+                    ${isSelected ? '<svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                    ${isLocked && !isSelected ? '<svg class="w-3 h-3 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>' : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-0.5">
+                        <div class="font-bold text-sm ${isSelected ? 'text-indigo-900' : 'text-gray-800'} ${isLocked ? 'text-gray-400' : ''}">${code}</div>
+                        <div class="flex items-center">${badgeHTML}</div>
+                    </div>
+                    <div class="text-[10px] text-gray-500 truncate pr-2 font-medium">${name}</div>
+                    ${preReqText ? `<div class="text-[9px] text-gray-400 mt-0.5 italic truncate">${preReqText}</div>` : ''}
+                </div>
+            `;
+            if(!isLocked) {
+                div.addEventListener('click', () => {
+                    if(isSelected) state.selectedSubjects = state.selectedSubjects.filter(s => s !== code);
+                    else state.selectedSubjects.push(code);
+                    renderSubjectList();
+                    updateGenerateButton();
+                });
+            }
+            el.subjectListContainer.appendChild(div);
+        });
+    }
+
+    renderGroup('Core Subjects', validCore, false);
+    renderGroup('Electives', validElectives, true);
+    
+    el.selectedCount.textContent = `${state.selectedSubjects.length}/${state.targetSubjectCount}`;
+}
+
+function updateGenerateButton() {
+    const valid = state.selectedProgram !== '';
+    if(valid) {
+        el.btnGenerate.disabled = false;
+        el.btnGenerate.classList.remove('bg-gray-300', 'cursor-not-allowed');
+        el.btnGenerate.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'active:scale-95');
+        
+        const needed = Math.max(0, state.targetSubjectCount - state.selectedSubjects.length);
+        if(needed > 0) {
+            el.btnGenerate.textContent = `AUTO-FILL & GENERATE (${state.targetSubjectCount})`;
+            el.generateHint.textContent = `System will automatically add ${needed} subject(s) to reach full load.`;
+            el.generateHint.classList.remove('hidden');
+        } else {
+            el.btnGenerate.textContent = "GENERATE TIMETABLES";
+            el.generateHint.classList.add('hidden');
+        }
+    } else {
+        el.btnGenerate.disabled = true;
+        el.btnGenerate.classList.add('bg-gray-300', 'cursor-not-allowed');
+        el.btnGenerate.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'active:scale-95');
+        el.generateHint.classList.add('hidden');
+    }
+}
+
+function openCompletedModal() {
+    el.modalBackdrop.classList.remove('hidden');
+    el.modalContent.innerHTML = '';
+    const { core, electives } = getSubjectsForProgram(state.allSubjectCodes, state.selectedProgram);
+    
+    const createSection = (title, subjects, colorClass) => {
+        if(subjects.length === 0) return;
+        const sectionTitle = document.createElement('h4');
+        sectionTitle.className = `text-xs font-bold uppercase tracking-wider mb-3 ${colorClass} bg-opacity-20 px-2 py-1 rounded inline-block`;
+        sectionTitle.textContent = title;
+        
+        const grid = document.createElement('div');
+        grid.className = "grid grid-cols-2 md:grid-cols-3 gap-3 mb-6";
+        
+        subjects.forEach(code => {
+            const isChecked = state.completedSubjects.includes(code);
+            const item = document.createElement('label');
+            item.className = `flex items-center p-3 rounded-lg border cursor-pointer text-sm transition-all shadow-sm ${isChecked ? 'bg-gray-100 border-gray-300 opacity-60' : 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow'}`;
+            item.innerHTML = `
+                <input type="checkbox" value="${code}" class="hidden" ${isChecked ? 'checked' : ''}>
+                <div class="w-5 h-5 border rounded mr-3 flex items-center justify-center transition-colors ${isChecked ? 'bg-gray-600 border-gray-600' : 'border-gray-300 bg-white'}">
+                     ${isChecked ? '<svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+                </div>
+                <span class="font-medium ${isChecked ? 'line-through text-gray-500' : 'text-gray-800'}">${code}</span>
+            `;
+            item.querySelector('input').addEventListener('change', (e) => {
+                 if(e.target.checked) state.completedSubjects.push(code);
+                 else state.completedSubjects = state.completedSubjects.filter(c => c !== code);
+                 // Re-render immediate visual
+                 const box = item.querySelector('div');
+                 const txt = item.querySelector('span');
+                 if(e.target.checked) {
+                     item.classList.add('bg-gray-100', 'opacity-60', 'border-gray-300');
+                     item.classList.remove('bg-white', 'border-gray-200', 'hover:border-indigo-300', 'hover:shadow');
+                     box.classList.add('bg-gray-600', 'border-gray-600');
+                     box.classList.remove('border-gray-300', 'bg-white');
+                     box.innerHTML = '<svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+                     txt.classList.add('line-through', 'text-gray-500');
+                     txt.classList.remove('text-gray-800');
+                 } else {
+                     item.classList.remove('bg-gray-100', 'opacity-60', 'border-gray-300');
+                     item.classList.add('bg-white', 'border-gray-200', 'hover:border-indigo-300', 'hover:shadow');
+                     box.classList.remove('bg-gray-600', 'border-gray-600');
+                     box.classList.add('border-gray-300', 'bg-white');
+                     box.innerHTML = '';
+                     txt.classList.remove('line-through', 'text-gray-500');
+                     txt.classList.add('text-gray-800');
+                 }
+            });
+            grid.appendChild(item);
+        });
+        
+        el.modalContent.appendChild(sectionTitle);
+        el.modalContent.appendChild(grid);
+    };
+
+    createSection('Core Subjects', core, 'text-indigo-700 bg-indigo-100');
+    createSection('Electives', electives, 'text-gray-700 bg-gray-200');
+}
+
+function handleGenerate() {
+    el.btnGenerate.innerHTML = '<div class="loader"></div>';
+    el.btnGenerate.disabled = true;
+
+    setTimeout(() => {
+        const { core, electives, maxElectives, rawElectives } = getSubjectsForProgram(state.allSubjectCodes, state.selectedProgram);
+        const prefs = {
+            maxDaysPerWeek: state.filterMode === 'quantity' ? state.desiredDaysCount : state.availableDays.length,
+            maxClassesPerDay: 5,
+            avoidFullClasses: state.preferences.avoidFullClasses,
+            preferredDays: [] 
+        };
+
+        let sessionsToSolve = state.processedSessions;
+        if(state.filterMode === 'specific') {
+            sessionsToSolve = sessionsToSolve.filter(s => state.availableDays.includes(s.day));
+        }
+
+        let results = [];
+        if(state.selectedSubjects.length < state.targetSubjectCount) {
+             const canAdd = (code) => {
+                 if(state.completedSubjects.includes(code)) return false;
+                 const check = checkPrerequisites(code, state.completedSubjects);
+                 if(!check.met && !state.isCommencing) return false;
+                 return true;
+             };
+             const validCores = core.filter(canAdd);
+             const validElectives = electives.filter(canAdd);
+             const candidatePool = [...validCores, ...validElectives];
+             
+             // Calculate elective constraint for auto-fill
+             const passedElectivesCount = state.completedSubjects.filter(s => rawElectives.includes(s)).length;
+             const remainingElectiveSlots = Math.max(0, maxElectives - passedElectivesCount);
+             
+             const electiveConstraint = {
+                 validElectives: rawElectives, // Use full elective list for checking
+                 remainingSlots: remainingElectiveSlots
+             };
+
+             results = findValidCombinations(sessionsToSolve, candidatePool, state.selectedSubjects, state.targetSubjectCount, prefs, electiveConstraint);
+        } else {
+            results = generateSchedules(sessionsToSolve, state.selectedSubjects, prefs);
+        }
+
+        state.generatedSchedules = results;
+        renderResults();
+        if(results.length > 0) {
+            showNotification(`Success! Found ${results.length} valid timetables.`, 'success');
+            setActiveSchedule(results[0].id);
+        } else {
+            showNotification('No valid timetables found. Try adjusting your filters.', 'error');
+            setActiveSchedule(null);
+        }
+        updateGenerateButton(); 
+    }, 100);
+}
+
+function renderResults() {
+    el.resultsList.innerHTML = '';
+    if(state.generatedSchedules.length > 0) {
+        el.resultsPanel.classList.remove('hidden');
+        el.resultsCount.textContent = `${state.generatedSchedules.length}`;
+    } else {
+        el.resultsPanel.classList.add('hidden');
+        return;
+    }
+    
+    state.generatedSchedules.forEach((schedule, index) => {
+        const div = document.createElement('div');
+        div.className = "p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md bg-white border-gray-100 group";
+        div.dataset.id = schedule.id;
+        
+        const subjects = [...new Set(schedule.sessions.map(s => s.subjectCode))];
+        let badgeColor = "bg-yellow-100 text-yellow-800";
+        if(schedule.daysActive <= 2) badgeColor = "bg-emerald-100 text-emerald-800";
+        else if(schedule.daysActive === 3) badgeColor = "bg-blue-100 text-blue-800";
+        
+        // Check for electives used
+        const { core } = getSubjectsForProgram(state.allSubjectCodes, state.selectedProgram);
+        const electivesUsed = subjects.filter(s => !core.includes(s));
+        
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex flex-col">
+                    <span class="font-bold text-gray-800 title text-sm group-hover:text-indigo-600 transition-colors">Option ${index + 1}</span>
+                    <span class="text-[10px] text-gray-400 flex items-center mt-0.5">
+                        <svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        ${schedule.sessions.length} Sessions
+                    </span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-1 rounded-md ${badgeColor} shadow-sm">${schedule.daysActive} Days</span>
+            </div>
+            <div class="text-xs text-gray-500 mb-2 leading-relaxed font-medium">
+                ${subjects.join(', ')}
+            </div>
+            ${electivesUsed.length > 0 ? 
+                `<div class="flex flex-wrap gap-1 mt-1">
+                    ${electivesUsed.map(e => `<span class="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded border border-amber-100">${e} (Elective)</span>`).join('')}
+                </div>` : ''
+            }
+        `;
+        div.addEventListener('click', () => setActiveSchedule(schedule.id));
+        el.resultsList.appendChild(div);
+    });
+}
+
+function setActiveSchedule(id) {
+    state.activeScheduleId = id;
+    const items = el.resultsList.children;
+    for(let item of items) {
+        const title = item.querySelector('.title');
+        if(item.dataset.id === id) {
+            item.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50', 'border-indigo-200');
+            item.classList.remove('border-gray-100', 'bg-white');
+        } else {
+            item.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50', 'border-indigo-200');
+            item.classList.add('border-gray-100', 'bg-white');
+        }
+    }
+    if(id) {
+        el.emptyState.classList.add('hidden');
+        const schedule = state.generatedSchedules.find(s => s.id === id);
+        renderCalendar(schedule);
+    } else {
+        el.emptyState.classList.remove('hidden');
+        el.calendarEvents.innerHTML = '';
+    }
+}
+
+// Calendar
+const COLORS = [
+  'bg-blue-100 border-blue-200 text-blue-800', 'bg-emerald-100 border-emerald-200 text-emerald-800',
+  'bg-purple-100 border-purple-200 text-purple-800', 'bg-amber-100 border-amber-200 text-amber-800',
+  'bg-rose-100 border-rose-200 text-rose-800', 'bg-cyan-100 border-cyan-200 text-cyan-800',
+];
+
+function renderCalendarGrid() {
+    el.calendarGrid.innerHTML = '';
+    const startHour = 8;
+    const endHour = 22;
+    for(let i = 0; i < (endHour - startHour); i++) {
+        const row = document.createElement('div');
+        // Fixed height 60px to represent 1 hour (1px = 1min)
+        row.style.height = "60px"; 
+        row.className = "grid grid-cols-7 border-b border-gray-100 box-border";
+        row.innerHTML = `<div class="text-[10px] font-medium text-gray-400 p-1 text-right border-r relative -top-2">${startHour + i}:00</div><div class="border-r border-gray-50"></div><div class="border-r border-gray-50"></div><div class="border-r border-gray-50"></div><div class="border-r border-gray-50"></div><div class="border-r border-gray-50"></div><div></div>`;
+        el.calendarGrid.appendChild(row);
+    }
+}
+
+function renderCalendar(schedule) {
+    el.calendarEvents.innerHTML = '';
+    if(!schedule) return;
+    const subColors = {};
+    const subjects = [...new Set(schedule.sessions.map(s => s.subjectCode))];
+    subjects.forEach((s, i) => subColors[s] = COLORS[i % COLORS.length]);
+    const startHour = 8;
+    schedule.sessions.forEach(session => {
+        const topOffset = session.startTime - (startHour * 60);
+        const duration = session.endTime - session.startTime;
+        // 1px per min logic
+        const pxPerMin = 1; 
+        const top = topOffset * pxPerMin;
+        const height = duration * pxPerMin;
+        
+        // Grid: 0=Time, 1=Mon, 2=Tue...
+        // CSS left calculation: (100/7) * colStart.
+        // If colStart = 1 -> 14.28% -> Mon column.
+        const colStart = session.dayIndex; 
+        const pData = PREREQUISITES[session.subjectCode];
+        const preReqText = pData ? pData.text : 'None';
+
+        const div = document.createElement('div');
+        div.className = `calendar-item absolute m-0.5 p-1.5 rounded-md border text-xs overflow-hidden leading-tight ${subColors[session.subjectCode]} fade-in shadow-sm hover:shadow-lg transition-all z-10 cursor-help group`;
+        div.style.top = `${top}px`;
+        div.style.height = `${height - 2}px`;
+        div.style.left = `calc(${(100/7) * colStart}% + 1px)`;
+        div.style.width = `calc(${100/7}% - 2px)`;
+        div.innerHTML = `
+            <div class="font-bold truncate text-[11px]">${session.subjectCode}</div>
+            <div class="truncate text-[9px] font-medium opacity-90">${session.activity}</div>
+            <div class="truncate text-[9px] opacity-75 mt-0.5">${session.rawTime}</div>
+            <div class="truncate text-[9px] opacity-75">${session.room}</div>
+        `;
+        
+        // Add Mouse Event for Tooltip
+        div.addEventListener('mouseenter', (e) => {
+            el.calendarTooltip.style.display = 'block';
+            el.calendarTooltip.innerHTML = `
+                <div class="font-bold text-sm mb-1">${session.subjectCode}: ${session.subjectName}</div>
+                <div class="text-xs text-gray-300 mb-2">${session.activity} | ${session.rawTime}</div>
+                <div class="border-t border-gray-600 pt-2 mt-2">
+                    <div class="flex justify-between text-[10px] text-gray-400">
+                        <span>Staff:</span>
+                        <span class="text-white">${session.staff}</span>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                        <span>Room:</span>
+                        <span class="text-white">${session.room}</span>
+                    </div>
+                    <div class="mt-2 text-[10px] text-amber-400 font-medium">
+                        ${preReqText ? `⚠️ ${preReqText}` : '✅ No Prerequisites'}
+                    </div>
+                </div>
+            `;
+            // Positioning
+            const rect = div.getBoundingClientRect();
+            const containerRect = el.calendarContainer.getBoundingClientRect();
+            let left = rect.left - containerRect.left + rect.width + 10;
+            let top = rect.top - containerRect.top;
+            
+            // Adjust if off screen
+            if (left + 220 > containerRect.width) {
+                left = rect.left - containerRect.left - 230;
+            }
+            
+            el.calendarTooltip.style.left = `${left}px`;
+            el.calendarTooltip.style.top = `${top}px`;
+        });
+        
+        div.addEventListener('mouseleave', () => {
+            el.calendarTooltip.style.display = 'none';
+        });
+
+        el.calendarEvents.appendChild(div);
+    });
+}
+
+function showNotification(msg, type) {
+    el.notificationBanner.classList.remove('hidden');
+    el.notificationBanner.classList.remove('bg-red-50', 'text-red-700', 'border-red-200', 'bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+    const icon = document.getElementById('notifIcon');
+    const txt = document.getElementById('notifMsg');
+    
+    if(type === 'error') {
+        el.notificationBanner.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-100');
+        icon.innerHTML = '<svg class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    } else {
+        el.notificationBanner.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-100');
+        icon.innerHTML = '<svg class="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    }
+    txt.textContent = msg;
+    setTimeout(() => { el.notificationBanner.classList.add('hidden'); }, 3000);
+}
+
+// Start
+init();
+
+</script>
+</body>
+</html>
