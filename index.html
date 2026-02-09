@@ -279,229 +279,189 @@
 // ==========================================
 // 1. DATA CONSTANTS & BUSINESS LOGIC
 // ==========================================
-const DEFAULT_CSV_DATA = `SUBJECTCODE,SUBJECTNAME,DAYOFWEEK,TIME,ACTIVITYNAME,CLASSID,CLASS,PERIOD,ROOMNAME,STAFFNAME,SUBJECTCOORDINATOR,FREQUENCY,YEAR,TRIMESTER
-ACC300,Auditing and Assurance Services,Friday,9:00:00 ~ 11:00:00,Lecture 1,ACC300NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2025,T3
-ACC300,Auditing and Assurance Services,Friday,11:00:00 ~ 13:00:00,Tutorial,ACC300NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2025,T3
-BUS709,Communication in Business,Friday,18:00:00 ~ 21:00:00,Session,BUS709NCLB0325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Sunaina GOWAN,Sunaina GOWAN,Weekly,2025,T3
-ICT106,Data Communication and Networks,Friday,13:00:00 ~ 15:00:00,Lecture 1,ICT106NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2025,T3
-ICT106,Data Communication and Networks,Friday,15:00:00 ~ 17:00:00,Tutorial,ICT106NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2025,T3
-ICT203,Human Computer Interaction,Friday,15:00:00 ~ 17:00:00,Lecture 1,ICT203NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
-ICT203,Human Computer Interaction,Friday,17:00:00 ~ 19:00:00,Tutorial,ICT203NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
-ICT370,Data Analytics,Friday,15:00:00 ~ 17:00:00,Lecture 1,ICT370NCLC0325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Nasim Ahmed,Firoz ANWAR,Weekly,2025,T3
-ICT370,Data Analytics,Friday,17:00:00 ~ 19:00:00,Tutorial,ICT370NCLCT10325,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Nasim Ahmed,Firoz ANWAR,Weekly,2025,T3
-ICT371,Artificial Intelligence,Friday,13:00:00 ~ 15:00:00,Lecture 1,ICT371NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
-ICT371,Artificial Intelligence,Friday,15:00:00 ~ 17:00:00,Tutorial,ICT371NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
-ICT703,Information Systems Analysis and Design,Friday,12:00:00 ~ 15:00:00,Session,ICT703NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2025,T3
-ICT723,Virtualisation and Cloud Computing,Friday,9:00:00 ~ 12:00:00,Session,ICT723NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2025,T3
-ICT729,Capstone Project 2,Friday,10:00:00 ~ 11:00:00,Lecture 1,ICT729NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT729,Capstone Project 2,Friday,13:00:00 ~ 14:00:00,Lecture 1,ICT729NCLD0325,4,31-Oct-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT729,Capstone Project 2,Friday,11:00:00 ~ 13:00:00,Tutorial,ICT729NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT729,Capstone Project 2,Friday,14:00:00 ~ 16:00:00,Tutorial,ICT729NCLDT10325,4,31-Oct-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT741,Digital Forensics,Friday,18:00:00 ~ 21:00:00,Session,ICT741NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
-ICT751,User Experience Fundamentals,Friday,15:00:00 ~ 18:00:00,Workshop A,ICT751NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2025,T3
-MBA907,Leading the Global and Collaborative Workforce,Friday,12:00:00 ~ 15:00:00,Workshop B,MBA907NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Antony John DREW,Sunaina GOWAN,Weekly,2025,T3
-MBA908,Designing and Leading Technology Centric Enterprises,Friday,15:00:00 ~ 18:00:00,Session,MBA908NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mohammad MOBASHER KASHANI,MD Shafiqur RAHMAN,Weekly,2025,T3
-MBA910,Data Driven Strategic Decision Making,Friday,12:00:00 ~ 15:00:00,Session,MBA910NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Mohammad MOBASHER KASHANI,Tanjum HAQUE,Weekly,2025,T3
-MGT302,Strategic Management,Friday,14:00:00 ~ 16:00:00,Lecture 1,MGT302NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Lovasoa Nantenaina ANDRIAMORA,Weekly,2025,T3
-MGT302,Strategic Management,Friday,16:00:00 ~ 18:00:00,Tutorial,MGT302NCLAT10325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Lovasoa Nantenaina ANDRIAMORA,Weekly,2025,T3
-MGT700,Introduction to Business Management,Friday,15:00:00 ~ 18:00:00,Workshop A,MGT700NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Elsa Alexandra LICUMBA,Fadi KOTOB,Weekly,2025,T3
-TSL715,Research Project,Friday,11:00:00 ~ 14:00:00,Session,TSL715NCLA0325,1,31-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
-TSL718,TESOL Practicum,Friday,14:00:00 ~ 17:00:00,Placement,,2,31-Oct-2025 ~ 01-Feb-2026,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2025,T3
-ACC203,Accounting Information Systems,Monday,15:00:00 ~ 17:00:00,Lecture 1,ACC203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2025,T3
-ACC203,Accounting Information Systems,Monday,17:00:00 ~ 19:00:00,Tutorial,ACC203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2025,T3
-BUS300,Business Ethics and Sustainability,Monday,9:00:00 ~ 11:00:00,Lecture 1,BUS300NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
-BUS300,Business Ethics and Sustainability,Monday,11:00:00 ~ 13:00:00,Tutorial,BUS300NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
-FIN203,Banking and Finance,Monday,15:00:00 ~ 17:00:00,Lecture 1,FIN203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
-FIN203,Banking and Finance,Monday,17:00:00 ~ 19:00:00,Tutorial,FIN203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
-ICT100,Foundations of Information Systems,Monday,9:00:00 ~ 11:00:00,Lecture 1,ICT100NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2025,T3
-ICT100,Foundations of Information Systems,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT100NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2025,T3
-ICT102,Introduction to Programming,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT102NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2025,T3
-ICT102,Introduction to Programming,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT102NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2025,T3
-ICT200,Database Design and Development,Monday,9:00:00 ~ 11:00:00,Lecture 1,ICT200NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,BRIAN KANG,Saad Sajid Hashmi,Weekly,2025,T3
-ICT200,Database Design and Development,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT200NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,BRIAN KANG,Saad Sajid Hashmi,Weekly,2025,T3
-ICT205,Cyber Security,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT205NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Touseef RANA,Babur JALAL,Weekly,2025,T3
-ICT205,Cyber Security,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT205NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Touseef RANA,Babur JALAL,Weekly,2025,T3
-ICT274,E-commerce,Monday,13:00:00 ~ 15:00:00,Lecture 1,ICT274NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2025,T3
-ICT274,E-commerce,Monday,15:00:00 ~ 17:00:00,Tutorial,ICT274NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2025,T3
-ICT302,Information Technology Project 2,Monday,10:00:00 ~ 11:00:00,Lecture 1,ICT302NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Monday,11:00:00 ~ 13:00:00,Tutorial,ICT302NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
-ICT370,Data Analytics,Monday,15:00:00 ~ 17:00:00,Lecture 1,ICT370NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
-ICT370,Data Analytics,Monday,17:00:00 ~ 19:00:00,Tutorial,ICT370NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
-ICT702,Introduction to Database Design,Monday,9:00:00 ~ 12:00:00,Session,ICT702NCLB0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2025,T3
-ICT726,Web Development,Monday,9:00:00 ~ 12:00:00,Session,ICT726NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Rekha NACHIAPPAN,Rekha NACHIAPPAN,Weekly,2025,T3
-ICT730,Security Analytics,Monday,15:00:00 ~ 18:00:00,Session,ICT730NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2025,T3
-ICT750,Information Systems Professional Practice,Monday,18:00:00 ~ 21:00:00,Workshop A,ICT750NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ilja NASTJUK,Ilja NASTJUK,Weekly,2025,T3
-LSC101,Learning Skills Centre-Mathematics,Monday,11:00:00 ~ 13:00:00,Session,LSC101LBNC0325,2,24-Nov-2025 ~ 20-Dec-2025,Online Class,Krish Ramanathan,,Weekly,2025,T3
-LSC105,Learning Skills Centre-Statistics,Monday,11:00:00 ~ 13:00:00,Session,LSC105NCLA0325,1,24-Nov-2025 ~ 21-Dec-2025,Online Class,Krish Ramanathan,,Weekly,2025,T3
-MBA911,Study Tour,Monday,12:00:00 ~ 15:00:00,Session,MBA911NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,G04 classroom,James Growdon COOPER,James Growdon COOPER,Weekly,2025,T3
-MGT203,Operations Management,Monday,17:00:00 ~ 19:00:00,Lecture 1,MGT203NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2025,T3
-MGT203,Operations Management,Monday,19:00:00 ~ 21:00:00,Tutorial,MGT203NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2025,T3
-MGT300,Logistics Management,Monday,13:00:00 ~ 15:00:00,Lecture 1,MGT300NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
-MGT300,Logistics Management,Monday,15:00:00 ~ 17:00:00,Tutorial,MGT300NCLAT10325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2025,T3
-TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2025,T3
-TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,SYED Zaidi,SYED Zaidi,Fortnightly,2025,T3
-TSL700,Language Teaching Methodologies,Monday,13:00:00 ~ 16:00:00,Session,TSL700NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,SYED Zaidi,SYED Zaidi,Fortnightly,2025,T3
-TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,Ellie YOUNG,,Weekly,2025,T3
-TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,Ellie YOUNG,,Fortnightly,2025,T3
-TSL703,Phonology and Teaching Pronunciation,Monday,17:00:00 ~ 20:00:00,Session,TSL703NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,Ellie YOUNG,,Fortnightly,2025,T3
-TSL709,Literature and Language Teaching,Monday,10:00:00 ~ 13:00:00,Session,TSL709NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2025,T3
-TSL718,TESOL Practicum,Monday,14:00:00 ~ 17:00:00,Workshop A,TSL718NCLA0325,1,27-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
-TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,27-Oct-2025 ~ 15-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
-TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,24-Nov-2025 ~ 13-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-TSL719,Grammar for Language Teachers,Monday,17:00:00 ~ 20:00:00,Session,TSL719NCLA0325,1,05-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-ICT275,Innovation and Technology Management,Saturday,9:00:00 ~ 11:00:00,Lecture 1,ICT275NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
-ICT275,Innovation and Technology Management,Saturday,11:00:00 ~ 13:00:00,Tutorial,ICT275NCLAT10325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2025,T3
-ICT302,Information Technology Project 2,Saturday,11:00:00 ~ 12:00:00,Lecture 1,ICT302NCLB0325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Saturday,12:00:00 ~ 14:00:00,Tutorial,ICT302NCLBT10325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,Poria PIROZMAND,Sarita KOIRALA,Weekly,2025,T3
-ICT725,User Experience and Mobile Application Development,Saturday,9:00:00 ~ 12:00:00,Session,ICT725NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2025,T3
-ICT729,Capstone Project 2,Saturday,12:00:00 ~ 13:00:00,Lecture 1,ICT729NCLC0325,3,01-Nov-2025 ~ 01-Feb-2026,Online Class,Mohamed Atef Ali Rajab MADNI,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT729,Capstone Project 2,Saturday,13:00:00 ~ 15:00:00,Tutorial,ICT729NCLCT10325,3,01-Nov-2025 ~ 01-Feb-2026,Online Class,Mohamed Atef Ali Rajab MADNI,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT731,Data Mining,Saturday,9:00:00 ~ 12:00:00,Session,ICT731NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Rachid Hamadi,Rachid Hamadi,Weekly,2025,T3
-ICT752,Enterprise Information Systems,Saturday,15:00:00 ~ 18:00:00,Workshop A,ICT752NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Ali BRAYTEE,Prabhu Jyot Singh,Weekly,2025,T3
-ICT772,"Cyber Security Governance, Risk and Compliance",Saturday,9:00:00 ~ 12:00:00,Workshop A,ICT772NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Babur JALAL,Fazla RABBY,Weekly,2025,T3
-MBA907,Leading the Global and Collaborative Workforce,Saturday,9:00:00 ~ 12:00:00,Workshop B,MBA907NCLB0325,2,01-Nov-2025 ~ 01-Feb-2026,Online Class,mohammed ALAM,Sunaina GOWAN,Weekly,2025,T3
-MBA912,Management Report,Saturday,12:00:00 ~ 15:00:00,Session,MBA912NCLA0325,1,01-Nov-2025 ~ 01-Feb-2026,Online Class,Lovasoa Nantenaina ANDRIAMORA,Gazi HOSSAIN,Weekly,2025,T3
-ACC100,Introduction to Accounting,Thursday,15:00:00 ~ 17:00:00,Lecture 1,ACC100NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2025,T3
-ACC100,Introduction to Accounting,Thursday,17:00:00 ~ 19:00:00,Tutorial,ACC100NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2025,T3
-ACC202,Management Accounting,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ACC202NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
-ACC202,Management Accounting,Thursday,15:00:00 ~ 17:00:00,Tutorial,ACC202NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
-ACC301,Tax Law,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ACC301NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2025,T3
-ACC301,Tax Law,Thursday,15:00:00 ~ 17:00:00,Tutorial,ACC301NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2025,T3
-ACC303,Contemporary Issues in Accounting,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ACC303NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2025,T3
-ACC303,Contemporary Issues in Accounting,Thursday,11:00:00 ~ 13:00:00,Tutorial,ACC303NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2025,T3
-ACC700,Principles of Accounting,Thursday,12:00:00 ~ 15:00:00,Session,ACC700NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Seyedmohammad MOUSAVIAN,Behnaz ORTAKAND,Weekly,2025,T3
-ACC701,Financial Accounting,Thursday,9:00:00 ~ 12:00:00,Session,ACC701NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Vikki Melia,Meth MAVANANE HEWA,Weekly,2025,T3
-ACC702,Managerial Accounting,Thursday,12:00:00 ~ 15:00:00,Session,ACC702NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G04 classroom,Stephen Amponsah,Nazmi Saeb Nazmi JARRAR,Weekly,2025,T3
-ACC707,Auditing and Assurance,Thursday,18:00:00 ~ 21:00:00,Session,ACC707NCLB0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Demi Chung,Lu Jiao,Weekly,2025,T3
-BUS200,Law of Business Organisations,Thursday,9:00:00 ~ 11:00:00,Lecture 1,BUS200NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2025,T3
-BUS200,Law of Business Organisations,Thursday,11:00:00 ~ 13:00:00,Tutorial,BUS200NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2025,T3
-BUS304,Consumer Behaviour,Thursday,9:00:00 ~ 11:00:00,Lecture 1,BUS304NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Jianchun LI,Jianchun LI,Weekly,2025,T3
-BUS304,Consumer Behaviour,Thursday,11:00:00 ~ 13:00:00,Tutorial,BUS304NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Jianchun LI,Jianchun LI,Weekly,2025,T3
-BUS710,Research Project,Thursday,15:00:00 ~ 18:00:00,Session,BUS710NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G01 Lecture Theatre,Elsa Alexandra LICUMBA,Sayma RAHMAN,Weekly,2025,T3
-ECO100,Introduction to Economics,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ECO100NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
-ECO100,Introduction to Economics,Thursday,11:00:00 ~ 13:00:00,Tutorial,ECO100NCLAT0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2025,T3
-FIN200,Corporate Financial Management,Thursday,9:00:00 ~ 11:00:00,Lecture 1,FIN200NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
-FIN200,Corporate Financial Management,Thursday,11:00:00 ~ 13:00:00,Tutorial,FIN200NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
-FIN700,Financial Management,Thursday,12:00:00 ~ 15:00:00,Session,FIN700NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Vikki Melia,Ruhina KARIM,Weekly,2025,T3
-ICT103,Systems Analysis and Design,Thursday,9:00:00 ~ 11:00:00,Lecture 1,ICT103NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2025,T3
-ICT103,Systems Analysis and Design,Thursday,11:00:00 ~ 13:00:00,Tutorial,ICT103NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2025,T3
-ICT104,Program Design and Development,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ICT104NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2025,T3
-ICT104,Program Design and Development,Thursday,15:00:00 ~ 17:00:00,Tutorial,ICT104NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,108 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2025,T3
-ICT201,Computer Organisation and Architecture,Thursday,17:00:00 ~ 19:00:00,Lecture 1,ICT201NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2025,T3
-ICT201,Computer Organisation and Architecture,Thursday,19:00:00 ~ 21:00:00,Tutorial,ICT201NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2025,T3
-ICT204,Project Management,Thursday,15:00:00 ~ 17:00:00,Lecture 1,ICT204NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rashidul MUBASHER,Rashidul MUBASHER,Weekly,2025,T3
-ICT204,Project Management,Thursday,17:00:00 ~ 19:00:00,Tutorial,ICT204NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Rashidul MUBASHER,Rashidul MUBASHER,Weekly,2025,T3
-ICT272,Web Design and Development,Thursday,13:00:00 ~ 15:00:00,Lecture 1,ICT272NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Umesh Poudel,Weekly,2025,T3
-ICT272,Web Design and Development,Thursday,15:00:00 ~ 17:00:00,Tutorial,ICT272NCLAT10325,1,30-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,BRIAN KANG,Umesh Poudel,Weekly,2025,T3
-ICT302,Information Technology Project 2,Thursday,12:00:00 ~ 13:00:00,Lecture 1,ICT302NCLE0325,5,30-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Thursday,13:00:00 ~ 15:00:00,Tutorial,ICT302NCLET10325,5,30-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Sarita KOIRALA,Weekly,2025,T3
-ICT711,Programming and Algorithms,Thursday,9:00:00 ~ 12:00:00,Session,ICT711NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Jnanamurthy HK,Saad Sajid Hashmi,Weekly,2025,T3
-ICT722,Information Security,Thursday,18:00:00 ~ 21:00:00,Session,ICT722NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2025,T3
-ICT729,Capstone Project 2,Thursday,10:00:00 ~ 11:00:00,Lecture 1,ICT729NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sajad GHATREHSAMANI,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT729,Capstone Project 2,Thursday,11:00:00 ~ 13:00:00,Tutorial,ICT729NCLBT10325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sajad GHATREHSAMANI,Sajad GHATREHSAMANI,Weekly,2025,T3
-ICT742,Cloud Privacy and Security,Thursday,15:00:00 ~ 18:00:00,Session,ICT742NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,MD Monir HOSSAIN,MD Monir HOSSAIN,Weekly,2025,T3
-ICT752,Enterprise Information Systems,Thursday,15:00:00 ~ 18:00:00,Workshop A,ICT752NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Mohamad NAJI,Prabhu Jyot Singh,Weekly,2025,T3
-ICT753,Industry Project,Thursday,12:00:00 ~ 15:00:00,Workshop A,ICT753NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Sweta Thakur,Ali BRAYTEE,Weekly,2025,T3
-ICT761,Business Analytics and Business Intelligence,Thursday,13:00:00 ~ 16:00:00,Workshop A,ICT761NCLA0325,2,30-Oct-2025 ~ 01-Feb-2026,106 Classroom,Mohammad MOBASHER KASHANI,Xin GU,Weekly,2025,T3
-ICT762,Data Analytics and Data Visualisation,Thursday,12:00:00 ~ 15:00:00,Workshop A,ICT762NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Sanjay Jha,Shuvashis SAHA,Weekly,2025,T3
-MBA901,Career Ownership,Thursday,13:00:00 ~ 16:00:00,Session,MBA901NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,105 Classroom,Kenny Jay SHELSWELL,Evi LANASIER,Weekly,2025,T3
-MBA902,"Leading Ethical, Sustainable and Responsible Enterprise",Thursday,9:00:00 ~ 12:00:00,Session,MBA902NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G03 Classroom,Antony John DREW,Thomas DENIGAN,Weekly,2025,T3
-MBA903,Personal Performance and Resilience,Thursday,18:00:00 ~ 21:00:00,Session,MBA903NCLB0325,2,30-Oct-2025 ~ 01-Feb-2026,Online Class,Zaira ADNAN,Evi LANASIER,Weekly,2025,T3
-MBA904,Human Centred Design,Thursday,15:00:00 ~ 18:00:00,Session,MBA904NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,G03 Classroom,Lovasoa Nantenaina ANDRIAMORA,Fariha Anjum Hira,Weekly,2025,T3
-TSL705,Language Testing and Assessment,Thursday,12:00:00 ~ 15:00:00,Session,TSL705NCLA0325,1,30-Oct-2025 ~ 01-Feb-2026,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2025,T3
-TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,30-Oct-2025 ~ 08-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
-TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,20-Nov-2025 ~ 07-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,18-Dec-2025 ~ 21-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
-TSL713,Research Methods of TESOL,Thursday,17:00:00 ~ 20:00:00,Session,TSL713NCLA0325,1,15-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-ACC101,Introduction to Financial Accounting,Tuesday,10:00:00 ~ 12:00:00,Lecture 1,ACC101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2025,T3
-ACC101,Introduction to Financial Accounting,Tuesday,12:00:00 ~ 14:00:00,Tutorial,ACC101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2025,T3
-ACC201,Financial Accounting,Tuesday,17:00:00 ~ 19:00:00,Lecture 1,ACC201NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Meth MAVANANE HEWA,Meth MAVANANE HEWA,Weekly,2025,T3
-ACC201,Financial Accounting,Tuesday,19:00:00 ~ 21:00:00,Tutorial,ACC201NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Jiusi (Ethan) Zheng,Meth MAVANANE HEWA,Weekly,2025,T3
-ACC705,Corporate Accounting and Reporting,Tuesday,12:00:00 ~ 15:00:00,Session,ACC705NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Vikki Melia,Patricia VAKAFUA,Weekly,2025,T3
-ACC706,Accounting Theory and Issues,Tuesday,9:00:00 ~ 12:00:00,Session,ACC706NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Vikki Melia,Nazmi Saeb Nazmi JARRAR,Weekly,2025,T3
-ACC708,Taxation Law,Tuesday,15:00:00 ~ 18:00:00,Session,ACC708NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John TAGGART,Weekly,2025,T3
-BUS100,Professional Communication Skills,Tuesday,9:00:00 ~ 11:00:00,Lecture 1,BUS100NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,105 Classroom,Scott BAILEY,Amanda HERRING,Weekly,2025,T3
-BUS100,Professional Communication Skills,Tuesday,11:00:00 ~ 13:00:00,Tutorial,BUS100NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,105 Classroom,Scott BAILEY,Amanda HERRING,Weekly,2025,T3
-BUS101,Introduction to Business Law,Tuesday,11:00:00 ~ 13:00:00,Lecture 1,BUS101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2025,T3
-BUS101,Introduction to Business Law,Tuesday,13:00:00 ~ 15:00:00,Tutorial,BUS101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2025,T3
-BUS303,Business Project,Tuesday,17:00:00 ~ 19:00:00,Lecture 1,BUS303NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Rex WALSH,Rex WALSH,Weekly,2025,T3
-BUS303,Business Project,Tuesday,19:00:00 ~ 21:00:00,Tutorial,BUS303NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Rex WALSH,Rex WALSH,Weekly,2025,T3
-BUS700,Economics,Tuesday,18:00:00 ~ 21:00:00,Session,BUS700NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Mary Amponsah,Mary Amponsah,Weekly,2025,T3
-BUS708,Statistics and Data Analysis,Tuesday,12:00:00 ~ 15:00:00,Session,BUS708NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Krish MURALEE,Cherry MOLINA,Weekly,2025,T3
-BUS709,Communication in Business,Tuesday,9:00:00 ~ 12:00:00,Session,BUS709NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Zoe DREW,Sunaina GOWAN,Weekly,2025,T3
-FIN201,Investment Management,Tuesday,9:00:00 ~ 11:00:00,Lecture 1,FIN201NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
-FIN201,Investment Management,Tuesday,11:00:00 ~ 13:00:00,Tutorial,FIN201NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2025,T3
-ICT101,Discrete Mathematics for IT,Tuesday,15:00:00 ~ 17:00:00,Lecture 1,ICT101NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2025,T3
-ICT101,Discrete Mathematics for IT,Tuesday,17:00:00 ~ 19:00:00,Tutorial,ICT101NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,103 Computer Lab,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Tuesday,9:00:00 ~ 10:00:00,Lecture 1,ICT302NCLC0325,3,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sarita KOIRALA,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Tuesday,16:00:00 ~ 17:00:00,Lecture 1,ICT302NCLD0325,4,28-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Tuesday,10:00:00 ~ 12:00:00,Tutorial,ICT302NCLCT10325,3,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sarita KOIRALA,Sarita KOIRALA,Weekly,2025,T3
-ICT302,Information Technology Project 2,Tuesday,17:00:00 ~ 19:00:00,Tutorial,ICT302NCLDT10325,4,28-Oct-2025 ~ 01-Feb-2026,Online Class,Anchal SHRESTHA,Sarita KOIRALA,Weekly,2025,T3
-ICT304,Enterprise Systems and Architecture,Tuesday,13:00:00 ~ 15:00:00,Lecture 1,ICT304NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
-ICT304,Enterprise Systems and Architecture,Tutorial,ICT304NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,Tuesday,15:00:00 ~ 17:00:00,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2025,T3
-ICT700,Introduction to Business Information Systems,Tuesday,12:00:00 ~ 15:00:00,Workshop A,ICT700NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,107 Computer Lab,Ebrahim Shahzad AWAN,Faisal NADEEM,Weekly,2025,T3
-ICT701,Programming Fundamentals,Tuesday,9:00:00 ~ 12:00:00,Session,ICT701NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2025,T3
-ICT710,IT Governance and Emerging Technologies,Tuesday,15:00:00 ~ 18:00:00,Session,ICT710NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,107 Computer Lab,Ebrahim Shahzad AWAN,MD Shafiqur RAHMAN,Weekly,2025,T3
-ICT724,Intelligent Systems,Tuesday,12:00:00 ~ 15:00:00,Session,ICT724NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,104 Computer Lab,Hui WU,Hui Wu,Weekly,2025,T3
-ICT732,Big Data,Tuesday,9:00:00 ~ 12:00:00,Session,ICT732NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Sanjay Jha,Sanjay Jha,Weekly,2025,T3
-ICT734,Machine Learning,Tuesday,12:00:00 ~ 15:00:00,Session,ICT734NCLA0325,1,28-Oct-2025 ~ 15-Feb-2026,108 Computer Lab,Zhiheng LI,Zhiheng LI,Weekly,2025,T3
-ICT740,Applied Cybersecurity,Tuesday,18:00:00 ~ 21:00:00,Session,ICT740NCLB0325,2,28-Oct-2025 ~ 01-Feb-2026,Online Class,MD Monir HOSSAIN,Prabhu Jyot Singh,Weekly,2025,T3
-LSC100,Learning Skills Centre-English,Tuesday,9:00:00 ~ 11:00:00,Session,LSC100NCLA0325,1,18-Nov-2025 ~ 09-Dec-2025,Online Class,Amanda HERRING,Juan Wu,Weekly,2025,T3
-LSC101,Learning Skills Centre-Mathematics,Tuesday,9:00:00 ~ 11:00:00,Session,LSC101LANC0325,1,25-Nov-2025 ~ 20-Dec-2025,Online Class,Shabana CHANNA,,Weekly,2025,T3
-LSC103,Learning Skills Centre-Monitoring Students Academic Conduct,Tuesday,11:00:00 ~ 13:00:00,Session,LSC103NCLA0325,1,18-Nov-2025 ~ 09-Dec-2025,Online Class,Amanda HERRING,Juan Wu,Weekly,2025,T3
-MBA903,Personal Performance and Resilience,Tuesday,15:00:00 ~ 18:00:00,Session,MBA903NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G04 classroom,Thomas Joseph Donohue,Evi LANASIER,Weekly,2025,T3
-MBA905,Research Principles and Methodologies,Tuesday,12:00:00 ~ 15:00:00,Session,MBA905NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Zoe DREW,MD Shafiqur RAHMAN,Weekly,2025,T3
-MGT100,Introduction to Management,Tuesday,15:00:00 ~ 17:00:00,Lecture 1,MGT100NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Jennifer Michele YOUNG,mohammed ALAM,Weekly,2025,T3
-MGT100,Introduction to Management,Tuesday,17:00:00 ~ 19:00:00,Tutorial,MGT100NCLAT10325,1,28-Oct-2025 ~ 01-Feb-2026,G02 Classroom,Jennifer Michele YOUNG,mohammed ALAM,Weekly,2025,T3
-TSL702,Learning an Additional Language,Tuesday,13:00:00 ~ 16:00:00,Session,TSL702NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,Amanda HERRING,Amanda HERRING,Weekly,2025,T3
-TSL702,Learning an Additional Language,Tuesday,13:00:00 ~ 16:00:00,Session,TSL702NCLA0325,1,18-Nov-2025 ~ 01-Feb-2026,Online Class,Amanda HERRING,Amanda HERRING,Fortnightly,2025,T3
-TSL717,New Technologies in Language Teaching,Tuesday,10:00:00 ~ 13:00:00,Session,TSL717NCLA0325,1,28-Oct-2025 ~ 01-Feb-2026,Online Class,Amanda HERRING,Amanda HERRING,Weekly,2025,T3
-TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 20:00:00,Session,TSL720NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Weekly,2025,T3
-TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,18-Nov-2025 ~ 07-Dec-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Fortnightly,2025,T3
-TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,16-Dec-2025 ~ 21-Dec-2025,Online Class,Ellie YOUNG,Ellie YOUNG,Weekly,2025,T3
-TSL720,Academic Literacy for TESOL,Tuesday,17:00:00 ~ 18:00:00,Session,TSL720NCLA0325,1,13-Jan-2026 ~ 01-Feb-2026,Online Class,Ellie YOUNG,Ellie YOUNG,Fortnightly,2025,T3
-TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,28-Oct-2025 ~ 08-Nov-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
-TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,18-Nov-2025 ~ 07-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,16-Dec-2025 ~ 21-Dec-2025,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2025,T3
-TSL721,Psychology of Language Learning,Tuesday,17:00:00 ~ 20:00:00,Session,TSL721NCLA0325,1,13-Jan-2026 ~ 01-Feb-2026,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Fortnightly,2025,T3
-ACC200,Introduction to Management Accounting,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ACC200NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
-ACC200,Introduction to Management Accounting,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ACC200NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2025,T3
-ACC204,Corporate Accounting and Reporting,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ACC204NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Behnaz ORTAKAND,Behnaz ORTAKAND,Weekly,2025,T3
-ACC204,Corporate Accounting and Reporting,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ACC204NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Behnaz ORTAKAND,Behnaz ORTAKAND,Weekly,2025,T3
-ACC703,Accounting Information Systems,Wednesday,9:00:00 ~ 12:00:00,Session,ACC703NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Stephen Amponsah,Ilja NASTJUK,Weekly,2025,T3
-ACC704,Companies and Securities Law,Wednesday,18:00:00 ~ 21:00:00,Session,ACC704NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,John TAGGART,John TAGGART,Weekly,2025,T3
-BUS104,Introduction to Marketing,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,BUS104NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Jennifer Michele YOUNG,Jianchun LI,Weekly,2025,T3
-BUS104,Introduction to Marketing,Wednesday,11:00:00 ~ 13:00:00,Tutorial,BUS104NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Jennifer Michele YOUNG,Jianchun LI,Weekly,2025,T3
-BUS105,Business Statistics,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,BUS105NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mary Amponsah,Matthew MACCALLUM,Weekly,2025,T3
-BUS105,Business Statistics,Wednesday,15:00:00 ~ 17:00:00,Tutorial,BUS105NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,101 Lecture Theatre,Mary Amponsah,Matthew MACCALLUM,Weekly,2025,T3
-BUS302,Entrepreneurship,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,BUS302NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2025,T3
-BUS302,Entrepreneurship,Wednesday,15:00:00 ~ 17:00:00,Tutorial,BUS302NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2025,T3
-BUS702,Business Law,Wednesday,12:00:00 ~ 15:00:00,Session,BUS702NCLA0325,2,29-Oct-2025 ~ 01-Feb-2026,G03 Classroom,John TAGGART,Phillip DIVISEK,Weekly,2025,T3
-BUS707,Applied Business Research,Wednesday,15:00:00 ~ 18:00:00,Session,BUS707NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Evi LANASIER,Evi LANASIER,Weekly,2025,T3
-ICT204,Project Management,Wednesday,15:00:00 ~ 17:00:00,Lecture 1,ICT204NCLB0325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ahmad HUSSEIN,Rashidul MUBASHER,Weekly,2025,T3
-ICT204,Project Management,Wednesday,17:00:00 ~ 19:00:00,Tutorial,ICT204NCLBT10325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ahmad HUSSEIN,Rashidul MUBASHER,Weekly,2025,T3
-ICT301,Information Technology Project 1,Wednesday,10:00:00 ~ 11:00:00,Lecture 1,ICT301NCLB0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sachin Kumar Singh,Sweta Thakur,Weekly,2025,T3
-ICT301,Information Technology Project 1,Wednesday,11:00:00 ~ 13:00:00,Tutorial,ICT301NCLBT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Sweta Thakur,Weekly,2025,T3
-ICT303,Professional Ethics in Computing,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,ICT303NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2025,T3
-ICT303,Professional Ethics in Computing,Wednesday,11:00:00 ~ 13:00:00,Tutorial,ICT303NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2025,T3
-ICT372,Mobile Computing,Wednesday,13:00:00 ~ 15:00:00,Lecture 1,ICT372NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Imtiazuddin Ali Khan MOHAMMED,Imtiazuddin Ali Khan MOHAMMED,Weekly,2025,T3
-ICT372,Mobile Computing,Wednesday,15:00:00 ~ 17:00:00,Tutorial,ICT372NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Imtiazuddin Ali Khan MOHAMMED,Imtiazuddin Ali Khan MOHAMMED,Weekly,2025,T3
-ICT373,Cloud Computing,Wednesday,11:00:00 ~ 13:00:00,Lecture 1,ICT373NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2025,T3
-ICT373,Cloud Computing,Wednesday,13:00:00 ~ 15:00:00,Tutorial,ICT373NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2025,T3
-ICT712,Information Technology Project Management,Wednesday,12:00:00 ~ 15:00:00,Session,ICT712NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Ilja NASTJUK,Fadi KOTOB,Weekly,2025,T3
-ICT713,Advanced Database Design and Development,Wednesday,9:00:00 ~ 12:00:00,Session,ICT713NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Faisal NADEEM,Divya LEEKHA,Weekly,2025,T3
-ICT722,Information Security,Wednesday,18:00:00 ~ 21:00:00,Session,ICT722NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sheeraz MEMON,Muhammad Sajjad Akbar,Weekly,2025,T3
-ICT728,Capstone Project 1,Wednesday,13:00:00 ~ 14:00:00,Lecture 1,ICT728NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
-ICT728,Capstone Project 1,Wednesday,14:00:00 ~ 16:00:00,Tutorial,ICT728NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2025,T3
-ICT733,Social Web Analytics,Wednesday,9:00:00 ~ 12:00:00,Session,ICT733NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Xin GU,Xin GU,Weekly,2025,T3
-ICT740,Applied Cybersecurity,Wednesday,9:00:00 ~ 12:00:00,Session,ICT740NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Babur JALAL,Prabhu Jyot Singh,Weekly,2025,T3
-ICT743,IoT Security,Wednesday,12:00:00 ~ 15:00:00,Session,ICT743NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Sheeraz MEMON,Prabhu Jyot Singh,Weekly,2025,T3
-ICT762,Data Analytics and Data Visualisation,Wednesday,12:00:00 ~ 15:00:00,Workshop A,ICT762NCLB0325,2,29-Oct-2025 ~ 01-Feb-2026,Online Class,Shuvashis SAHA,Shuvashis SAHA,Weekly,2025,T3
-MBA906,Financial Data Analysis and Management,Wednesday,12:00:00 ~ 15:00:00,Session,MBA906NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,102 Computer Lab,Stephen Amponsah,Lu Jiao,Weekly,2025,T3
-MBA909,Data Analytics,Wednesday,18:00:00 ~ 21:00:00,Session,MBA909NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2025,T3
-MGT200,Organisational Behaviour,Wednesday,9:00:00 ~ 11:00:00,Lecture 1,MGT200NCLA0325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2025,T3
-MGT200,Organisational Behaviour,Wednesday,11:00:00 ~ 13:00:00,Tutorial,MGT200NCLAT10325,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2025,T3
-TSL718,TESOL Practicum,Wednesday,17:30:00 ~ 20:30:00,Placement,,1,29-Oct-2025 ~ 01-Feb-2026,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2025,T3`;
+const DEFAULT_CSV_DATA = `SUBJECTCODE,SUBJECTNAME,ACTIVITYNAME,CLASSID,CLASS,BOOKINGSEQUENCENUMBER,PERIOD,DAYOFWEEK,TIME1,ROOMNAME,STAFFNAME,SUBJECTCOORDINATOR,FREQUENCY,YEAR,TRIMESTER,__md5Row
+Subject Code,Subject Name,Activity Name,Class ID,Class,Booking Seq,Period,Day of Week,Time,Room Name,Staff Name,Subject Coordinator,Frequency,Year,Study Period,
+TSL720,Academic Literacy for TESOL,Session,TSL720NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,18:00:00 ~ 21:00:00,Online Class,Ellie YOUNG,Ellie YOUNG,Weekly,2026,T1,
+TSL719,Grammar for Language Teachers,Session,TSL719NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,17:00:00 ~ 20:00:00,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2026,T1,
+TSL718,TESOL Practicum,Placement,,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:30:00 ~ 20:30:00,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2026,T1,
+TSL718,TESOL Practicum,Placement,,2,1,06-Mar-2026 ~ 07-Jun-2026,Friday,14:00:00 ~ 17:00:00,Online Class,Mazin YOUSIF,Farzaneh MAYABADI,Weekly,2026,T1,
+TSL718,TESOL Practicum,Workshop A,TSL718NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 12:00:00,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2026,T1,
+TSL715,Research Project,Session,TSL715NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,14:00:00 ~ 17:00:00,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2026,T1,
+TSL713,Research Methods of TESOL,Session,TSL713NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 20:00:00,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2026,T1,
+TSL712,English for Specific Purposes,Lecture 1,TSL712NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,17:00:00 ~ 20:00:00,Online Class,Jana REZKOVA,SYED Zaidi,Weekly,2026,T1,
+TSL711,Intercultural Communication,Session,TSL711NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 20:00:00,Online Class,May Mehtap Kocatepe,May Mehtap Kocatepe,Weekly,2026,T1,
+TSL705,Language Testing and Assessment,Session,TSL705NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,14:00:00 ~ 17:00:00,Online Class,Farzaneh MAYABADI,Farzaneh MAYABADI,Weekly,2026,T1,
+TSL704,TESOL Curriculum Development,Lecture 1,TSL704NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,11:00:00 ~ 14:00:00,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2026,T1,
+TSL702,Learning an Additional Language,Session,TSL702NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,13:00:00 ~ 16:00:00,Online Class,Amanda HERRING,Amanda HERRING,Weekly,2026,T1,
+TSL700,Language Teaching Methodologies,Session,TSL700NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,14:00:00 ~ 17:00:00,Online Class,SYED Zaidi,SYED Zaidi,Weekly,2026,T1,
+MGT700,Introduction to Business Management,Workshop A,MGT700NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,15:00:00 ~ 18:00:00,G01 Lecture Theatre,James Growdon COOPER,Fadi KOTOB,Weekly,2026,T1,
+MGT302,Strategic Management,Lecture 1,MGT302NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,13:00:00 ~ 15:00:00,Online Class,Lovasoa Nantenaina ANDRIAMORA,Ian Jin,Weekly,2026,T1,
+MGT302,Strategic Management,Tutorial,MGT302NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 17:00:00,Online Class,Lovasoa Nantenaina ANDRIAMORA,Ian Jin,Weekly,2026,T1,
+MGT300,Logistics Management,Lecture 1,MGT300NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,13:00:00 ~ 15:00:00,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2026,T1,
+MGT300,Logistics Management,Tutorial,MGT300NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,Online Class,Ajay KUMAR,Ajay KUMAR,Weekly,2026,T1,
+MGT203,Operations Management,Lecture 1,MGT203NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2026,T1,
+MGT203,Operations Management,Tutorial,MGT203NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,19:00:00 ~ 21:00:00,Online Class,Fadi KOTOB,Fadi KOTOB,Weekly,2026,T1,
+MGT201,Cross Cultural Management,Lecture 1,MGT201NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,17:00:00 ~ 19:00:00,Online Class,mohammed ALAM,mohammed ALAM,Weekly,2026,T1,
+MGT201,Cross Cultural Management,Tutorial,MGT201NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,19:00:00 ~ 21:00:00,Online Class,mohammed ALAM,mohammed ALAM,Weekly,2026,T1,
+MGT200,Organisational Behaviour,Lecture 1,MGT200NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,9:00:00 ~ 11:00:00,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2026,T1,
+MGT200,Organisational Behaviour,Tutorial,MGT200NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,11:00:00 ~ 13:00:00,Online Class,Karen MAHAR,Karen Lin MAHAR,Weekly,2026,T1,
+MGT100,Introduction to Management,Lecture 1,MGT100NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:00:00 ~ 19:00:00,Online Class,mohammed ALAM,Tonmoy CHOUDHURY,Weekly,2026,T1,
+MGT100,Introduction to Management,Tutorial,MGT100LAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,19:00:00 ~ 21:00:00,Online Class,mohammed ALAM,Tonmoy CHOUDHURY,Weekly,2026,T1,
+MBA912,Management Report,Session,MBA912NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 12:00:00,G04 classroom,Craig EWAN EWAN,Gazi HOSSAIN,Weekly,2026,T1,
+MBA911,Study Tour,Session,,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,12:00:00 ~ 15:00:00,G04 classroom,Elsa Alexandra LICUMBA,James Growdon COOPER,Weekly,2026,T1,
+MBA910,Data Driven Strategic Decision Making,Session,MBA910NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 12:00:00,106 Classroom,Mohammad MOBASHER KASHANI,Tanjum HAQUE,Weekly,2026,T1,
+MBA909,Data Analytics,Session,MBA909NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,18:00:00 ~ 21:00:00,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2026,T1,
+MBA909,Data Analytics,Session,MBA909NCLB0126,2,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,18:00:00 ~ 21:00:00,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2026,T1,
+MBA908,Designing and Leading Technology Centric Enterprises,Session,MBA908NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,9:00:00 ~ 12:00:00,G01 Lecture Theatre,Mohammad MOBASHER KASHANI,MD Shafiqur RAHMAN,Weekly,2026,T1,
+MBA907,Leading the Global and Collaborative Workforce,Workshop B,MBA907NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,12:00:00 ~ 15:00:00,G01 Lecture Theatre,Antony John DREW,Sunaina GOWAN,Weekly,2026,T1,
+MBA906,Financial Data Analysis and Management,Session,MBA906NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,12:00:00 ~ 15:00:00,107 Computer Lab,Stephen Amponsah,Lu Jiao,Weekly,2026,T1,
+MBA905,Research Principles and Methodologies,Session,MBA905NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,G02 Classroom,Zoe DREW,Fariha Anjum Hira,Weekly,2026,T1,
+MBA904,Human Centred Design,Session,MBA904NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,G01 Lecture Theatre,James Growdon COOPER,,Weekly,2026,T1,
+MBA903,Personal Performance and Resilience,Session,MBA903NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,15:00:00 ~ 18:00:00,G04 classroom,Craig EWAN EWAN,Evi LANASIER,Weekly,2026,T1,
+MBA902,"Leading Ethical, Sustainable and Responsible Enterprise",Session,MBA902NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 12:00:00,G03 Classroom,Antony John DREW,Thomas DENIGAN,Weekly,2026,T1,
+MBA901,Career Ownership,Session,MBA901NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,14:00:00 ~ 17:00:00,G02 Classroom,Kenny Jay SHELSWELL,Evi LANASIER,Weekly,2026,T1,
+ICT772,"Cyber Security Governance, Risk and Compliance",Workshop A,ICT772NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,18:00:00 ~ 21:00:00,Online Class,Fazla RABBY,Morty AL-BANNA,Weekly,2026,T1,
+ICT762,Data Analytics and Data Visualisation,Workshop A,ICT762NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,12:00:00 ~ 15:00:00,104 Computer Lab,Sanjay Jha,Sanjay Jha,Weekly,2026,T1,
+ICT761,Business Analytics and Business Intelligence,Workshop A,ICT761NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,13:00:00 ~ 16:00:00,106 Classroom,Mohammad MOBASHER KASHANI,Xin GU,Weekly,2026,T1,
+ICT753,Industry Project,Workshop A,ICT753NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,12:00:00 ~ 15:00:00,Online Class,Sweta Thakur,Ali BRAYTEE,Weekly,2026,T1,
+ICT752,Enterprise Information Systems,Workshop A,ICT752NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 18:00:00,103 Computer Lab,BeeBee CHUA,Prabhu Jyot Singh,Weekly,2026,T1,
+ICT751,User Experience Fundamentals,Workshop A,ICT751NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 18:00:00,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2026,T1,
+ICT750,Information Systems Professional Practice,Workshop A,ICT750NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,18:00:00 ~ 21:00:00,Online Class,Ilja NASTJUK,Ilja NASTJUK,Weekly,2026,T1,
+ICT743,IoT Security,Session,ICT743NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,12:00:00 ~ 15:00:00,Online Class,Prabhu Jyot Singh,Prabhu Jyot Singh,Weekly,2026,T1,
+ICT742,Cloud Privacy and Security,Session,ICT742NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 18:00:00,Online Class,MD Monir HOSSAIN,MD Monir HOSSAIN,Weekly,2026,T1,
+ICT741,Digital Forensics,Session,ICT741NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,18:00:00 ~ 21:00:00,Online Class,MD BADIUZZAMAN,Shahzad Iqbal MIAN,Weekly,2026,T1,
+ICT740,Applied Cybersecurity,Session,ICT740NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,18:00:00 ~ 21:00:00,Online Class,MD Monir HOSSAIN,MD Monir HOSSAIN,Weekly,2026,T1,
+ICT734,Machine Learning,Session,ICT734NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,108 Computer Lab,Zhiheng LI,Zhiheng LI,Weekly,2026,T1,
+ICT732,Big Data,Session,ICT732NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,14:00:00 ~ 17:00:00,Online Class,Sanjay Jha,Sanjay Jha,Weekly,2026,T1,
+ICT731,Data Mining,Session,ICT731NCLA0126,1,1,07-Mar-2026 ~ 07-Jun-2026,Saturday,9:00:00 ~ 12:00:00,Online Class,Rachid Hamadi,Rachid Hamadi,Weekly,2026,T1,
+ICT730,Security Analytics,Session,ICT730NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 18:00:00,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2026,T1,
+ICT729,Capstone Project 2,Lecture 1,ICT729NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,12:00:00 ~ 13:00:00,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2026,T1,
+ICT729,Capstone Project 2,Tutorial,ICT729NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,13:00:00 ~ 15:00:00,Online Class,Ali BRAYTEE,Sajad GHATREHSAMANI,Weekly,2026,T1,
+ICT728,Capstone Project 1,Lecture 1,ICT728NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,12:00:00 ~ 13:00:00,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2026,T1,
+ICT728,Capstone Project 1,Tutorial,ICT728NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,13:00:00 ~ 15:00:00,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2026,T1,
+ICT726,Web Development,Session,ICT726NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 12:00:00,Online Class,Rekha NACHIAPPAN,Mubashir HUSSAIN,Weekly,2026,T1,
+ICT725,User Experience and Mobile Application Development,Session,ICT725NCLA0126,1,1,07-Mar-2026 ~ 07-Jun-2026,Saturday,9:00:00 ~ 12:00:00,Online Class,Aroba KHAN,Aroba KHAN,Weekly,2026,T1,
+ICT724,Intelligent Systems,Session,ICT724NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,104 Computer Lab,Hui WU,Hui Wu,Weekly,2026,T1,
+ICT723,Virtualisation and Cloud Computing,Session,ICT723NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 12:00:00,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2026,T1,
+ICT722,Information Security,Session,ICT722NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,18:00:00 ~ 21:00:00,Online Class,Muhammad Sajjad Akbar,Muhammad Sajjad Akbar,Weekly,2026,T1,
+ICT713,Advanced Database Design and Development,Session,ICT713NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,9:00:00 ~ 12:00:00,104 Computer Lab,,Divya LEEKHA,Weekly,2026,T1,
+ICT712,Information Technology Project Management,Session,ICT712NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,18:00:00 ~ 21:00:00,Online Class,Muhammad Rabiul HASAN,Fadi KOTOB,Weekly,2026,T1,
+ICT711,Programming and Algorithms,Session,ICT711NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,9:00:00 ~ 12:00:00,103 Computer Lab,Jnanamurthy HK,Ahsan SAADAT,Weekly,2026,T1,
+ICT710,IT Governance and Emerging Technologies,Session,ICT710NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,12:00:00 ~ 15:00:00,104 Computer Lab,Ebrahim Shahzad AWAN,MD Shafiqur RAHMAN,Weekly,2026,T1,
+ICT703,Information Systems Analysis and Design,Session,ICT703NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,14:00:00 ~ 17:00:00,103 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2026,T1,
+ICT703,Information Systems Analysis and Design,Session,ICT703NCLB0126,2,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 12:00:00,Online Class,Jnanamurthy HK,Jnanamurthy H K,Weekly,2026,T1,
+ICT702,Introduction to Database Design,Session,ICT702NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,18:00:00 ~ 21:00:00,Online Class,Mohamad NAJI,Mohamad NAJI,Weekly,2026,T1,
+ICT701,Programming Fundamentals,Session,ICT701NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,107 Computer Lab,Jnanamurthy HK,Jnanamurthy H K,Weekly,2026,T1,
+ICT701,Programming Fundamentals,Session,ICT701NCLB0126,2,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,14:00:00 ~ 17:00:00,Online Class,Jnanamurthy HK,Jnanamurthy H K,Weekly,2026,T1,
+ICT700,Introduction to Business Information Systems,Workshop A,ICT700NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 18:00:00,104 Computer Lab,Ebrahim Shahzad AWAN,Sajad GHATREHSAMANI,Weekly,2026,T1,
+ICT373,Cloud Computing,Lecture 1,ICT373NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,9:00:00 ~ 11:00:00,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2026,T1,
+ICT373,Cloud Computing,Tutorial,ICT373NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,11:00:00 ~ 13:00:00,Online Class,Nitya Karmakar,nitya Karmakar,Weekly,2026,T1,
+ICT372,Mobile Computing,Lecture 1,ICT372NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 17:00:00,Online Class,Imtiazuddin Ali Khan MOHAMMED,Shuvashis SAHA,Weekly,2026,T1,
+ICT372,Mobile Computing,Tutorial,ICT372NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,17:00:00 ~ 19:00:00,Online Class,Imtiazuddin Ali Khan MOHAMMED,Shuvashis SAHA,Weekly,2026,T1,
+ICT371,Artificial Intelligence,Lecture 1,ICT371NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 17:00:00,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2026,T1,
+ICT371,Artificial Intelligence,Tutorial,ICT371NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 19:00:00,Online Class,Saeid IRANMANESH,Saeid IRANMANESH,Weekly,2026,T1,
+ICT370,Data Analytics,Lecture 1,ICT370NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2026,T1,
+ICT370,Data Analytics,Tutorial,ICT370NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,Online Class,Firoz ANWAR,Firoz ANWAR,Weekly,2026,T1,
+ICT304,Enterprise Systems and Architecture,Lecture 1,ICT304NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 11:00:00,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2026,T1,
+ICT304,Enterprise Systems and Architecture,Tutorial,ICT304NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,11:00:00 ~ 13:00:00,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2026,T1,
+ICT303,Professional Ethics in Computing,Lecture 1,ICT303NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,9:00:00 ~ 11:00:00,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2026,T1,
+ICT303,Professional Ethics in Computing,Tutorial,ICT303NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,11:00:00 ~ 13:00:00,Online Class,Divya LEEKHA,Divya LEEKHA,Weekly,2026,T1,
+ICT302,Information Technology Project 2,Lecture 1,ICT302NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,13:00:00 ~ 14:00:00,107 Computer Lab,BRIAN KANG,Sarita KOIRALA,Weekly,2026,T1,
+ICT302,Information Technology Project 2,Tutorial,ICT302NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,14:00:00 ~ 16:00:00,107 Computer Lab,BRIAN KANG,Sarita KOIRALA,Weekly,2026,T1,
+ICT301,Information Technology Project 1,Lecture 1,ICT301NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,14:00:00 ~ 15:00:00,Online Class,Sarita KOIRALA,Mubashir HUSSAIN,Weekly,2026,T1,
+ICT301,Information Technology Project 1,Tutorial,ICT301NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 17:00:00,Online Class,Sarita KOIRALA,Mubashir HUSSAIN,Weekly,2026,T1,
+ICT275,Innovation and Technology Management,Lecture 1,ICT275NCLA0126,1,1,07-Mar-2026 ~ 07-Jun-2026,Saturday,13:00:00 ~ 15:00:00,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2026,T1,
+ICT275,Innovation and Technology Management,Tutorial,ICT275NCLAT10126,1,1,07-Mar-2026 ~ 07-Jun-2026,Saturday,15:00:00 ~ 17:00:00,Online Class,MD BADIUZZAMAN,MD Badiuzzaman BODI,Weekly,2026,T1,
+ICT274,E-commerce,Lecture 1,ICT274NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,13:00:00 ~ 15:00:00,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2026,T1,
+ICT274,E-commerce,Tutorial,ICT274NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,Online Class,Mehrdad Razmjoo,Mehrdad Razmjoo,Weekly,2026,T1,
+ICT272,Web Design and Development,Lecture 1,ICT272NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 11:00:00,Online Class,Umesh Poudel,Umesh Poudel,Weekly,2026,T1,
+ICT272,Web Design and Development,Tutorial,ICT272NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,11:00:00 ~ 13:00:00,Online Class,Umesh Poudel,Umesh Poudel,Weekly,2026,T1,
+ICT205,Cyber Security,Lecture 1,ICT205NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,13:00:00 ~ 15:00:00,104 Computer Lab,Touseef RANA,Shuvashis SAHA,Weekly,2026,T1,
+ICT205,Cyber Security,Tutorial,ICT205NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,104 Computer Lab,Touseef RANA,Shuvashis SAHA,Weekly,2026,T1,
+ICT204,Project Management,Lecture 1,ICT204NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 11:00:00,103 Computer Lab,BeeBee CHUA,Jafar Sadeq HAMRA,Weekly,2026,T1,
+ICT204,Project Management,Tutorial,ICT204NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,11:00:00 ~ 13:00:00,103 Computer Lab,BeeBee CHUA,Jafar Sadeq HAMRA,Weekly,2026,T1,
+ICT203,Human Computer Interaction,Lecture 1,ICT203NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 11:00:00,Online Class,NAJAMUL KHAN,najamul khan,Weekly,2026,T1,
+ICT201,Computer Organisation and Architecture,Lecture 1,ICT201NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:00:00 ~ 19:00:00,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2026,T1,
+ICT201,Computer Organisation and Architecture,Tutorial,ICT201NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,19:00:00 ~ 21:00:00,Online Class,Mohammad Ali NOORI,Mohammad Ali NOORI,Weekly,2026,T1,
+ICT200,Database Design and Development,Lecture 1,ICT200NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,9:00:00 ~ 11:00:00,103 Computer Lab,BRIAN KANG,Anupam MAKHIJA,Weekly,2026,T1,
+ICT200,Database Design and Development,Tutorial,ICT200NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,11:00:00 ~ 13:00:00,103 Computer Lab,BRIAN KANG,Anupam MAKHIJA,Weekly,2026,T1,
+ICT106,Data Communication and Networks,Lecture 1,ICT106NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,13:00:00 ~ 15:00:00,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2026,T1,
+ICT106,Data Communication and Networks,Tutorial,ICT106NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 17:00:00,102 Computer Lab,Mahmoud Abdolhoseini,Mehrdad Razmjoo,Weekly,2026,T1,
+ICT104,Program Design and Development,Lecture 1,ICT104NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 17:00:00,102 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2026,T1,
+ICT104,Program Design and Development,Lecture 1,ICT104NCLB0126,2,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,13:00:00 ~ 15:00:00,Online Class,Zhiheng LI,Hui Wu,Weekly,2026,T1,
+ICT104,Program Design and Development,Tutorial,ICT104NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:00:00 ~ 19:00:00,102 Computer Lab,Zhiheng LI,Hui Wu,Weekly,2026,T1,
+ICT104,Program Design and Development,Tutorial,ICT104NCLBT10126,2,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 17:00:00,Online Class,Zhiheng LI,Hui Wu,Weekly,2026,T1,
+ICT103,Systems Analysis and Design,Lecture 1,ICT103NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 11:00:00,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2026,T1,
+ICT103,Systems Analysis and Design,Tutorial,ICT103NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,11:00:00 ~ 13:00:00,102 Computer Lab,BRIAN KANG,Nasim Ahmed,Weekly,2026,T1,
+ICT102,Introduction to Programming,Lecture 1,ICT102NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,102 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2026,T1,
+ICT102,Introduction to Programming,Tutorial,ICT102NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,102 Computer Lab,Zhiheng LI,Apel MAHMUD,Weekly,2026,T1,
+ICT101,Discrete Mathematics for IT,Lecture 1,ICT101NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 17:00:00,G03 Classroom,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2026,T1,
+ICT101,Discrete Mathematics for IT,Tutorial,ICT101NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 19:00:00,G03 Classroom,Hamed BAGHAL GHAFFARI,Shabana CHANNA,Weekly,2026,T1,
+ICT100,Foundations of Information Systems,Lecture 1,ICT100NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 11:00:00,104 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2026,T1,
+ICT100,Foundations of Information Systems,Tutorial,ICT100NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,11:00:00 ~ 13:00:00,104 Computer Lab,Touseef RANA,Touseef RANA,Weekly,2026,T1,
+FIN700,Financial Management,Session,FIN700NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 18:00:00,G03 Classroom,Vikki Melia,Ruhina KARIM,Weekly,2026,T1,
+FIN300,International Finance,Lecture 1,FIN300NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:00:00 ~ 19:00:00,Online Class,Nishith PANTHI,Arash RAD,Weekly,2026,T1,
+FIN300,International Finance,Tutorial,FIN300NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,19:00:00 ~ 21:00:00,Online Class,Nishith PANTHI,Arash RAD,Weekly,2026,T1,
+FIN203,Banking and Finance,Lecture 1,FIN203NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2026,T1,
+FIN203,Banking and Finance,Tutorial,FIN203NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2026,T1,
+FIN201,Investment Management,Lecture 1,FIN201NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 11:00:00,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2026,T1,
+FIN201,Investment Management,Tutorial,FIN201NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,11:00:00 ~ 13:00:00,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2026,T1,
+FIN200,Corporate Financial Management,Lecture 1,FIN200NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 11:00:00,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2026,T1,
+FIN200,Corporate Financial Management,Tutorial,FIN200NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,11:00:00 ~ 13:00:00,Online Class,Ruhina KARIM,Ruhina KARIM,Weekly,2026,T1,
+ECO100,Introduction to Economics,Lecture 1,ECO100NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 11:00:00,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2026,T1,
+ECO100,Introduction to Economics,Tutorial,ECO100NCLAT0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,11:00:00 ~ 13:00:00,Online Class,Atta Adu-Osae,Atta Adu-Osae,Weekly,2026,T1,
+BUS710,Research Business Project,Session,BUS710NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 18:00:00,Online Class,Elsa Alexandra LICUMBA,,Weekly,2026,T1,
+BUS709,Communication in Business,Session,BUS709NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 12:00:00,G02 Classroom,Zoe DREW,Sunaina GOWAN,Weekly,2026,T1,
+BUS708,Statistics and Data Analysis,Session,BUS708NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,102 Computer Lab,Mary Amponsah,Cherry MOLINA,Weekly,2026,T1,
+BUS707,Applied Business Research,Session,BUS707NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 18:00:00,Online Class,Elsa Alexandra LICUMBA,Evi LANASIER,Weekly,2026,T1,
+BUS702,Business Law,Session,BUS702NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,12:00:00 ~ 15:00:00,G03 Classroom,John TAGGART,Phillip DIVISEK,Weekly,2026,T1,
+BUS700,Economics,Session,BUS700NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,18:00:00 ~ 21:00:00,Online Class,Mary Amponsah,Mary Amponsah,Weekly,2026,T1,
+BUS303,Business Project,Lecture 1,BUS303NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,Online Class,Rex WALSH,Rex WALSH,Weekly,2026,T1,
+BUS303,Business Project,Tutorial,BUS303NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,19:00:00 ~ 21:00:00,Online Class,Rex WALSH,Rex WALSH,Weekly,2026,T1,
+BUS302,Entrepreneurship,Lecture 1,BUS302NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,13:00:00 ~ 15:00:00,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2026,T1,
+BUS302,Entrepreneurship,Tutorial,BUS302NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 17:00:00,Online Class,Thomas DENIGAN,Thomas DENIGAN,Weekly,2026,T1,
+BUS300,Business Ethics and Sustainability,Lecture 1,BUS300NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,9:00:00 ~ 11:00:00,Online Class,Ajay KUMAR,Jianchun LI,Weekly,2026,T1,
+BUS300,Business Ethics and Sustainability,Tutorial,BUS300NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,11:00:00 ~ 13:00:00,Online Class,Ajay KUMAR,Jianchun LI,Weekly,2026,T1,
+BUS200,Law of Business Organisations,Lecture 1,BUS200NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 11:00:00,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2026,T1,
+BUS200,Law of Business Organisations,Tutorial,BUS200NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,11:00:00 ~ 13:00:00,Online Class,Phillip DIVISEK,Phillip DIVISEK,Weekly,2026,T1,
+BUS104,Introduction to Marketing,Lecture 1,BUS104NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,15:00:00 ~ 17:00:00,Online Class,Jianchun LI,Mohammad Ali AKBAR,Weekly,2026,T1,
+BUS104,Introduction to Marketing,Tutorial,BUS104NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 19:00:00,Online Class,Jianchun LI,Mohammad Ali AKBAR,Weekly,2026,T1,
+BUS104,Introduction to Marketing,Tutorial,BUS104NCLAT20126,2,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 19:00:00,Online Class,Ian Jin,Mohammad Ali AKBAR,Weekly,2026,T1,
+BUS101,Introduction to Business Law,Lecture 1,BUS101NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,11:00:00 ~ 13:00:00,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2026,T1,
+BUS101,Introduction to Business Law,Tutorial,BUS101NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,13:00:00 ~ 15:00:00,G03 Classroom,John TAGGART,John Morris LANSER,Weekly,2026,T1,
+BUS100,Professional Communication Skills,Lecture 1,BUS100NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,9:00:00 ~ 11:00:00,G03 Classroom,Scott BAILEY,Sunaina GOWAN,Weekly,2026,T1,
+BUS100,Professional Communication Skills,Tutorial,BUS100NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,11:00:00 ~ 13:00:00,G03 Classroom,Scott BAILEY,Sunaina GOWAN,Weekly,2026,T1,
+ACC709,Accounting Analytics,Session,ACC709NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 12:00:00,Online Class,Demi Chung,,Weekly,2026,T1,
+ACC708,Taxation Law,Session,ACC708NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,15:00:00 ~ 18:00:00,G03 Classroom,John TAGGART,John TAGGART,Weekly,2026,T1,
+ACC707,Auditing and Assurance,Session,ACC707NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 18:00:00,Online Class,Jiao Lu,Lu Jiao,Weekly,2026,T1,
+ACC706,Accounting Theory and Issues,Session,ACC706NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 15:00:00,105 Classroom,Vikki Melia,Nazmi Saeb Nazmi JARRAR,Weekly,2026,T1,
+ACC705,Corporate Accounting and Reporting,Session,ACC705NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,12:00:00 ~ 15:00:00,G03 Classroom,Vikki Melia,Patricia VAKAFUA,Weekly,2026,T1,
+ACC704,Companies and Securities Law,Session,ACC704NCLA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,18:00:00 ~ 21:00:00,Online Class,John TAGGART,John TAGGART,Weekly,2026,T1,
+ACC703,Accounting Information Systems,Session,ACC703NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 18:00:00,101 Lecture Theatre,Stephen Amponsah,Soo Ryon YOO,Weekly,2026,T1,
+ACC702,Managerial Accounting,Session,ACC702NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,12:00:00 ~ 15:00:00,101 Lecture Theatre,Stephen Amponsah,Nazmi Saeb Nazmi JARRAR,Weekly,2026,T1,
+ACC701,Financial Accounting,Session,ACC701NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,15:00:00 ~ 18:00:00,105 Classroom,Vikki Melia,Meth MAVANANE HEWA,Weekly,2026,T1,
+ACC700,Principles of Accounting,Session,ACC700NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,9:00:00 ~ 12:00:00,101 Lecture Theatre,Seyedmohammad MOUSAVIAN,Bilal MUSTAFA,Weekly,2026,T1,
+ACC303,Contemporary Issues in Accounting,Lecture 1,ACC303NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,9:00:00 ~ 11:00:00,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2026,T1,
+ACC303,Contemporary Issues in Accounting,Tutorial,ACC303LAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,11:00:00 ~ 13:00:00,Online Class,Bilal MUSTAFA,Bilal MUSTAFA,Weekly,2026,T1,
+ACC301,Tax Law,Lecture 1,ACC301NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,13:00:00 ~ 15:00:00,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2026,T1,
+ACC301,Tax Law,Tutorial,ACC301NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 17:00:00,Online Class,Celine ADAMS,Celine ADAMS,Weekly,2026,T1,
+ACC300,Auditing and Assurance Services,Lecture 1,ACC300NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,9:00:00 ~ 11:00:00,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2026,T1,
+ACC300,Auditing and Assurance Services,Tutorial,ACC300NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,11:00:00 ~ 13:00:00,Online Class,Patricia VAKAFUA,Patricia VAKAFUA,Weekly,2026,T1,
+ACC204,Corporate Accounting and Reporting,Lecture 1,ACC204NCLA0126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,17:00:00 ~ 19:00:00,Online Class,Meth MAVANANE HEWA,Behnaz ORTAKAND,Weekly,2026,T1,
+ACC204,Corporate Accounting and Reporting,Tutorial,ACC204NCLAT10126,1,1,06-Mar-2026 ~ 07-Jun-2026,Friday,19:00:00 ~ 21:00:00,Online Class,Jun (Nathan) ZHANG,Behnaz ORTAKAND,Weekly,2026,T1,
+ACC203,Accounting Information Systems,Lecture 1,ACC203NCLA0126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,15:00:00 ~ 17:00:00,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2026,T1,
+ACC203,Accounting Information Systems,Tutorial,ACC203NCLAT10126,1,1,02-Mar-2026 ~ 07-Jun-2026,Monday,17:00:00 ~ 19:00:00,Online Class,Soo Ryon YOO,Soo Ryon YOO,Weekly,2026,T1,
+ACC202,Management Accounting,Lecture 1,ACC202NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,13:00:00 ~ 15:00:00,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2026,T1,
+ACC202,Management Accounting,Tutorial,ACC202NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 17:00:00,Online Class,Rita HASSAN,Rita HASSAN,Weekly,2026,T1,
+ACC201,Financial Accounting,Lecture 1,ACC201NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,15:00:00 ~ 17:00:00,Online Class,Bilal MUSTAFA,Meth MAVANANE HEWA,Weekly,2026,T1,
+ACC201,Financial Accounting,Tutorial,ACC201NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,17:00:00 ~ 19:00:00,Online Class,Jiusi (Ethan) Zheng,Meth MAVANANE HEWA,Weekly,2026,T1,
+ACC200,Introduction to Management Accounting,Lecture 1,ACC200LA0126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,13:00:00 ~ 15:00:00,Online Class,Rita HASSAN,ELAINE XU,Weekly,2026,T1,
+ACC200,Introduction to Management Accounting,Tutorial,ACC200NCLAT10126,1,1,04-Mar-2026 ~ 07-Jun-2026,Wednesday,15:00:00 ~ 17:00:00,Online Class,Rita HASSAN,ELAINE XU,Weekly,2026,T1,
+ACC101,Introduction to Financial Accounting,Lecture 1,ACC101NCLA0126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,10:00:00 ~ 12:00:00,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2026,T1,
+ACC101,Introduction to Financial Accounting,Tutorial,ACC101NCLAT10126,1,1,03-Mar-2026 ~ 07-Jun-2026,Tuesday,12:00:00 ~ 14:00:00,Online Class,Sheren Shafei,Sheren SHAFEI,Weekly,2026,T1,
+ACC100,Introduction to Accounting,Lecture 1,ACC100NCLA0126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,15:00:00 ~ 17:00:00,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2026,T1,
+ACC100,Introduction to Accounting,Tutorial,ACC100NCLAT10126,1,1,05-Mar-2026 ~ 07-Jun-2026,Thursday,17:00:00 ~ 19:00:00,103 Computer Lab,Seyedmohammad MOUSAVIAN,Meth MAVANANE HEWA,Weekly,2026,T1,
+,,,,,,,,,,,,,,,`;
 
 // --- PREREQUISITES ---
 const PREREQUISITES = {
@@ -557,6 +517,7 @@ const PREREQUISITES = {
   'ICT712': { req: [], text: 'Pre-req: 4 subjects completed', minSubjects: 4 },
   'ICT726': { req: ['ICT711'], text: 'Pre-req: ICT711' },
   'ICT762': { req: ['ICT761'], text: 'Pre-req: ICT761' },
+  'ICT724': { req: [], text: 'Pre-req: 8 subjects completed', minSubjects: 8 },
   'ICT731': { req: ['ICT713', 'ICT724'], text: 'Pre-req: ICT713, ICT724' },
   'ICT734': { req: ['ICT762'], text: 'Pre-req: ICT762' },
   'ICT727': { req: ['ICT712', 'ICT713'], text: 'Pre-req: ICT712, ICT713 & 12 subjects', minSubjects: 12 },
@@ -618,25 +579,25 @@ const PROGRAMS = [
     name: 'Master of IT (Standard - 15 Subj)', type: 'PG', 
     coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT725', 'ICT726', 'ICT727'], 
     electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
-    maxElectives: 4
+    maxElectives: 6
   },
   { 
     name: 'Master of IT (Data Analytics)', type: 'PG', 
     coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT724', 'ICT761', 'ICT762', 'ICT731', 'ICT734', 'ICT727', 'ICT732'], 
     electiveSubjects: ['ICT722', 'ICT723', 'ICT725', 'ICT726', 'ICT740', 'ICT741', 'ICT742', 'ICT743', 'ICT780', 'ICT772', 'ICT730', 'ICT733', ...PG_GEN_ELECTIVES],
-    maxElectives: 4
+    maxElectives: 6
   },
   { 
     name: 'Master of IT (Cybersecurity)', type: 'PG', 
     coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT722', 'ICT740', 'ICT730', 'ICT742', 'ICT743', 'ICT727', 'ICT772'], 
     electiveSubjects: ['ICT723', 'ICT724', 'ICT725', 'ICT726', 'ICT731', 'ICT761', 'ICT762', 'ICT741', 'ICT780', ...PG_GEN_ELECTIVES],
-    maxElectives: 4
+    maxElectives: 6
   },
   { 
     name: 'Master of IT (16 Subjects)', type: 'PG', 
     coreSubjects: ['BUS708', 'BUS709', 'ICT710', 'ICT711', 'ICT712', 'ICT713', 'ICT728', 'ICT729'], 
     electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
-    maxElectives: 4
+    maxElectives: 6
   },
   { 
     name: 'Graduate Diploma of IT', type: 'PG', 
@@ -651,10 +612,16 @@ const PROGRAMS = [
     maxElectives: 1
   },
   { 
-    name: 'Master of Information Systems', type: 'PG', 
-    coreSubjects: ['MGT700', 'ICT700', 'ICT701', 'ICT702', 'ICT761', 'ICT703', 'ICT751', 'ICT750', 'ICT722', 'ICT752', 'ICT753'], 
-    electiveSubjects: [...PG_IT_ELECTIVES, ...PG_GEN_ELECTIVES],
-    maxElectives: 4
+    name: 'Master of Information Systems (Business Analytics)', type: 'PG', 
+    coreSubjects: ['MGT700', 'ICT700', 'ICT701', 'ICT702', 'ICT761', 'ICT703', 'ICT751', 'ICT750', 'ICT722', 'ICT752', 'ICT753', 'ICT762', 'ICT724'], 
+    electiveSubjects: ['ICT723', 'ICT725', 'ICT772', 'ICT741', 'BUS700', 'BUS702', 'BUS707', 'ACC700', 'FIN700'],
+    maxElectives: 3
+  },
+  { 
+    name: 'Master of Information Systems (Information Security)', type: 'PG', 
+    coreSubjects: ['MGT700', 'ICT700', 'ICT701', 'ICT702', 'ICT761', 'ICT703', 'ICT751', 'ICT750', 'ICT722', 'ICT752', 'ICT753', 'ICT772', 'ICT741'], 
+    electiveSubjects: ['ICT723', 'ICT725', 'ICT762', 'ICT724', 'BUS700', 'BUS702', 'BUS707', 'ACC700', 'FIN700'],
+    maxElectives: 3
   },
   { 
     name: 'Graduate Diploma of Info Systems', type: 'PG', 
@@ -708,7 +675,7 @@ const PROGRAMS = [
     name: 'Bachelor of IT', type: 'UG', 
     coreSubjects: ['BUS100', 'ICT100', 'ICT101', 'ICT102', 'ICT103', 'ICT104', 'ICT106', 'BUS105', 'ICT200', 'ICT201', 'ICT204', 'ICT203', 'ICT205', 'ICT272', 'ICT302', 'ICT301', 'ICT303', 'ICT370'], 
     electiveSubjects: [...UG_IT_ELECTIVES, ...UG_GEN_ELECTIVES],
-    maxElectives: 4
+    maxElectives: 6
   },
   { 
     name: 'Bachelor of Business (Accounting)', type: 'UG', 
