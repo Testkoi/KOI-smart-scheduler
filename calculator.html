@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOI Smart Scheduler - Fee Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              indigo: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f9fafb; color: #1f2937; }
+      /* Remove arrow from number input */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm z-20 flex-shrink-0">
+        <div class="flex items-center space-x-3">
+             <div class="bg-indigo-600 p-2 rounded-lg text-white shadow-md">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2" transform="rotate(180 12 12)"></rect><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line><line x1="16" y1="9" x2="14" y2="9"></line></svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Fee Calculator</h1>
+                <p class="text-xs text-gray-500 font-medium">Estimate Trimester Fees</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+             <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 cursor-pointer bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg transition-all text-sm border border-gray-200 shadow-sm hover:shadow font-medium">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <span>Back to Scheduler</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 flex justify-center items-start">
+        <div class="w-full max-w-lg bg-white shadow-xl rounded-xl border border-gray-200 flex flex-col overflow-hidden">
+             <div class="p-6 bg-gray-50 space-y-5">
+                <!-- Program Selection inside calculator -->
+                 <div class="space-y-2">
+                    <label class="block text-xs font-bold text-gray-700 uppercase">Select Program</label>
+                    <select id="calcProgramSelect" class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                        <option value="">-- Choose Program --</option>
+                    </select>
+                 </div>
+
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tuition Fee</label>
+                    <div id="feeProgramName" class="text-sm font-semibold text-gray-900 mb-1">No Program Selected</div>
+                    <div class="flex items-center">
+                        <span class="text-2xl font-bold text-indigo-600 mr-1">$</span>
+                        <input type="number" id="feeBaseAmount" class="text-2xl font-bold text-indigo-600 w-32 bg-transparent border-b border-indigo-200 focus:border-indigo-600 outline-none p-0 transition-colors placeholder-indigo-300" value="0.00" placeholder="0">
+                        <span class="text-xs text-gray-500 ml-2">per trimester</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Scholarship Type</label>
+                            <select id="feeScholarshipType" class="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="percent">Percentage (%)</option>
+                                <option value="amount">Fixed Amount ($)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Scholarship Value</label>
+                            <input type="number" id="feeScholarshipValue" placeholder="0" class="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                             <label class="block text-xs font-bold text-gray-700">Student Status</label>
+                        </div>
+                        <label class="flex items-center p-3 border border-gray-200 rounded-lg bg-white cursor-pointer hover:border-indigo-300 transition-colors">
+                            <input type="checkbox" id="feeIsCommencing" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                            <div class="ml-3">
+                                <span class="block text-sm font-medium text-gray-900">New Student (Commencing)</span>
+                                <span class="block text-xs text-gray-500">Adds $250 Enrollment Fee (separate from Tuition)</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Amount Already Paid</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input type="number" id="feeAmountPaid" placeholder="0.00" class="w-full pl-7 p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 my-4"></div>
+
+                    <div>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="feeSplitPayment" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                            <span class="text-sm font-medium text-gray-700">Split Payment (50/50 Plan)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-900 text-white p-5 rounded-xl shadow-lg mt-4">
+                    <div class="flex justify-between items-center mb-2 text-indigo-200 text-xs">
+                        <span>Total Payable Amount</span>
+                        <span id="feeBreakdownSummary">Full Payment</span>
+                    </div>
+                    <div class="text-3xl font-bold mb-4" id="feeTotalPayable">$0.00</div>
+                    
+                    <div id="feeSplitDetails" class="hidden space-y-3 border-t border-indigo-800 pt-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-indigo-100">Pay Now (50%)</span>
+                            <span class="font-bold" id="feePayNow">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-indigo-100">Pay Later (50%)</span>
+                                <span class="text-[10px] text-indigo-300">Due: Friday, 10 April 2026</span>
+                            </div>
+                            <span class="font-bold" id="feePayLater">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    const PROGRAM_FEES = {
+      "Diploma of Accounting": 7250,
+      "Bachelor of Business (Accounting)": 7250,
+      "Master of Accounting": 8250,
+      "Master of Professional Accounting": 8250,
+      "Diploma of Management": 7250,
+      "Bachelor of Business (Management and Finance)": 7250,
+      "Graduate Certificate in Business": 8250,
+      "Graduate Diploma of Business": 8250,
+      "Master of Business Administration (MBA)": 6375,
+      "Diploma of Information Technology": 7750,
+      "Bachelor of Information Technology": 7750,
+      "Graduate Certificate of Information Technology": 9000,
+      "Graduate Diploma of Information Technology": 9000,
+      "Master of Information Technology": 9000,
+      "Master of Information Technology (Cybersecurity)": 9000,
+      "Master of Information Technology (Data Analytics)": 9000,
+      "Graduate Certificate of Information Systems": 9000,
+      "Graduate Diploma of Information Systems": 7500,
+      "Master of Information Systems (Business Analytics)": 7500,
+      "Master of Information Systems (Information Security)": 7500,
+      "Graduate Certificate of TESOL": 6187.50,
+      "Graduate Diploma of TESOL": 8250,
+      "Master of Arts (TESOL)": 8250,
+      "Master of Arts (TESOL) (Professional)": 8250
+    };
+
+    function initFeeCalculator() {
+        const programSelect = document.getElementById('calcProgramSelect');
+        const feeProgramName = document.getElementById('feeProgramName');
+        const feeBaseAmountInput = document.getElementById('feeBaseAmount');
+        const feeScholarshipType = document.getElementById('feeScholarshipType');
+        const feeScholarshipValue = document.getElementById('feeScholarshipValue');
+        const feeIsCommencing = document.getElementById('feeIsCommencing');
+        const feeAmountPaid = document.getElementById('feeAmountPaid');
+        const feeSplitPayment = document.getElementById('feeSplitPayment');
+        const feeTotalPayable = document.getElementById('feeTotalPayable');
+        const feeBreakdownSummary = document.getElementById('feeBreakdownSummary');
+        const feeSplitDetails = document.getElementById('feeSplitDetails');
+        const feePayNow = document.getElementById('feePayNow');
+        const feePayLater = document.getElementById('feePayLater');
+
+        for (const [name, fee] of Object.entries(PROGRAM_FEES)) {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            programSelect.appendChild(opt);
+        }
+
+        function updateBaseFeeFromProgram() {
+            const programName = programSelect.value;
+            const baseFee = PROGRAM_FEES[programName] || 0;
+            feeProgramName.textContent = programName || "No Program Selected";
+            feeBaseAmountInput.value = baseFee;
+            calculate();
+        }
+
+        function calculate() {
+            let grossTotal = parseFloat(feeBaseAmountInput.value) || 0;
+            const schVal = parseFloat(feeScholarshipValue.value) || 0;
+            if (schVal > 0) {
+                if (feeScholarshipType.value === 'percent') grossTotal = grossTotal - (grossTotal * (schVal / 100));
+                else grossTotal = grossTotal - schVal;
+            }
+            if (grossTotal < 0) grossTotal = 0;
+            if (feeIsCommencing.checked) grossTotal += 250;
+
+            const paid = parseFloat(feeAmountPaid.value) || 0;
+            let netTotal = grossTotal - paid;
+            if (netTotal < 0) netTotal = 0;
+
+            feeTotalPayable.textContent = "$" + netTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            if (feeSplitPayment.checked && grossTotal > 0) {
+                feeBreakdownSummary.textContent = "Split Payment Active";
+                feeSplitDetails.classList.remove('hidden');
+                const halfShare = grossTotal / 2;
+                let payNow = halfShare - paid;
+                let payLater = halfShare;
+                if (payNow < 0) { payLater += payNow; payNow = 0; }
+                if (payLater < 0) payLater = 0;
+                if (netTotal === 0) { payNow = 0; payLater = 0; }
+                feePayNow.textContent = "$" + payNow.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                feePayLater.textContent = "$" + payLater.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            } else {
+                feeBreakdownSummary.textContent = "Full Payment";
+                feeSplitDetails.classList.add('hidden');
+            }
+        }
+
+        programSelect.addEventListener('change', updateBaseFeeFromProgram);
+        [feeBaseAmountInput, feeScholarshipType, feeScholarshipValue, feeIsCommencing, feeAmountPaid, feeSplitPayment].forEach(el => {
+            el.addEventListener('input', calculate);
+            el.addEventListener('change', calculate);
+        });
+        
+        calculate();
+    }
+    
+    window.addEventListener('DOMContentLoaded', initFeeCalculator);
+    </script>
+</body>
+</html>
