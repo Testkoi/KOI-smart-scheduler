@@ -556,7 +556,10 @@ const PREREQUISITES = {
   'TSL711': { req: ['TSL700'], text: 'Pre-req: TSL700' },
   'TSL712': { req: ['TSL700', 'TSL704'], text: 'Pre-req: TSL700, TSL704' },
   'TSL721': { req: ['TSL702'], text: 'Pre-req: TSL702' },
-  'TSL703': { req: ['TSL700'], text: 'Pre-req: TSL700' }
+  'TSL703': { req: ['TSL700'], text: 'Pre-req: TSL700' },
+  'MBA909': { req: [], text: 'Pre-req: Assumed knowledge of MBA905' },
+  'MBA911': { req: [], text: 'Pre-req: At least 5 subjects from MBA901–MBA910 and approval of the MBA Program Director', minSubjects: 5 },
+  'MBA912': { req: [], text: 'Pre-req: At least 5 subjects from MBA901–MBA910 and approval of the MBA Program Director', minSubjects: 5 }
 };
 
 const CAPSTONES = ['ICT302', 'BUS303', 'ICT727', 'ICT729', 'ICT753', 'BUS711', 'BUS707', 'TSL715', 'TSL718'];
@@ -582,6 +585,12 @@ const PROGRAMS = [
     electiveSubjects: ['ICT723', 'ICT725', 'ICT762', 'ICT724', 'BUS700', 'BUS702', 'BUS707', 'ACC700', 'FIN700'],
     maxElectives: 3,
     electiveRules: { total: 3, maxGeneral: 1, minIS: 1, isList: ['ICT762', 'ICT724'] }
+  },
+  { 
+    name: 'Master of Business Administration', type: 'PG', 
+    coreSubjects: ['MBA901', 'MBA902', 'MBA903', 'MBA904', 'MBA905', 'MBA906', 'MBA907', 'MBA908', 'MBA909', 'MBA910', 'MBA911', 'MBA912'], 
+    electiveSubjects: [],
+    maxElectives: 0
   },
   { 
     name: 'Master of Accounting', type: 'PG', 
